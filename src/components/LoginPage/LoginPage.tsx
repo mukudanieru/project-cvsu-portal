@@ -13,7 +13,10 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { ModeToggle } from './mode-toggle'
+import { ModeToggle } from '.././mode-toggle'
+import { Spinner } from '@/components/ui/spinner'
+import { AlertDestructive } from './ErrorMessage'
+import type { AlertDestructiveProps } from './ErrorMessage'
 
 import { useState } from 'react'
 import { loginFn } from '@/server/auth'
@@ -25,7 +28,7 @@ type Props = {
 const LoginPage = ({ onSuccess }: Props) => {
   const [studentNumber, setStudentNumber] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<AlertDestructiveProps | null>(null)
   const [loading, setLoading] = useState(false)
 
   async function handleLogin(e: React.SubmitEvent) {
@@ -77,7 +80,7 @@ const LoginPage = ({ onSuccess }: Props) => {
             <CardDescription>Don't let your grades define you</CardDescription>
           </div>
 
-          {error && <div className="text-red-500 text-3xl">{error}</div>}
+          {error && <AlertDestructive {...error} />}
         </CardHeader>
 
         <CardContent>
@@ -112,7 +115,7 @@ const LoginPage = ({ onSuccess }: Props) => {
               </Field>
               <Field>
                 <Button type="submit" disabled={loading}>
-                  {loading ? 'Logging in...' : 'Login'}
+                  {loading ? <Spinner data-icon="inline-start" /> : 'Login'}
                 </Button>
                 <FieldDescription className="text-center">
                   Having issues with your account?{' '}

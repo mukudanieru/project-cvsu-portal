@@ -22,7 +22,12 @@ export const loginFn = createServerFn({ method: 'POST' })
     })
 
     if (!studentAccount) {
-      return { error: 'Student number not found.' }
+      return {
+        error: {
+          title: 'Login failed',
+          description: 'Student number not found.',
+        },
+      }
     }
 
     const passwordMatch = await verifyPassword(
@@ -31,7 +36,12 @@ export const loginFn = createServerFn({ method: 'POST' })
     )
 
     if (!passwordMatch) {
-      return { error: 'Password is incorrect.' }
+      return {
+        error: {
+          title: 'Login failed',
+          description: 'Password is incorrect.',
+        },
+      }
     }
 
     const session = await useAppSession()

@@ -1,7 +1,7 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import LoginPage from '#/components/LoginPage'
-import { Button } from '#/components/ui/button'
-import { getCurrentUserFn, logoutFn } from '#/server/auth'
+import LoginPage from '@/components/LoginPage/LoginPage'
+import { Button } from '@/components/ui/button'
+import { getCurrentUserFn, logoutFn } from '@/server/auth'
 
 export const Route = createFileRoute('/')({
   beforeLoad: async () => {
@@ -19,7 +19,7 @@ function App() {
 
   async function handleLogout() {
     await logoutFn()
-    router.invalidate()
+    await router.invalidate()
   }
 
   async function handleLoginSucess() {
