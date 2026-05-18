@@ -15,7 +15,38 @@ import {
 import { Input } from '@/components/ui/input'
 import { ModeToggle } from './mode-toggle'
 
-const LoginPage = () => {
+import { useState } from 'react'
+import { loginFn } from '@/server/auth'
+
+type Props = {
+  onSuccess?: () => void | Promise<void>
+}
+
+const LoginPage = ({ onSuccess }: Props) => {
+  const [studentNumber, setStudentNumber] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleLogin(e: React.SubmitEvent) {
+    e.preventDefault()
+
+    setLoading(true)
+    setError(null)
+
+    const result = await loginFn({
+      data: { studentNumber, password },
+    })
+
+    if (result.error) {
+      setError(result.error)
+    } else {
+      await onSuccess?.()
+    }
+
+    setLoading(false)
+  }
+
   return (
     <>
       <div className="absolute inset-0 bg-[url(/background.jpg)] bg-cover bg-center blur-sm" />
@@ -45,10 +76,12 @@ const LoginPage = () => {
             <CardTitle>Login to your account</CardTitle>
             <CardDescription>Don't let your grades define you</CardDescription>
           </div>
+
+          {error && <div className="text-red-500 text-3xl">{error}</div>}
         </CardHeader>
 
         <CardContent>
-          <form>
+          <form onSubmit={handleLogin}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="studentNumber">Student Number</FieldLabel>
@@ -59,16 +92,28 @@ const LoginPage = () => {
                   type="text"
                   placeholder="2********"
                   required
+                  onChange={(e) => {
+                    setStudentNumber(e.target.value)
+                  }}
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                  }}
+                />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? 'Logging in...' : 'Login'}
+                </Button>
                 <FieldDescription className="text-center">
                   Having issues with your account?{' '}
                   <a

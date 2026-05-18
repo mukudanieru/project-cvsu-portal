@@ -38,7 +38,7 @@ export const students = pgTable('students', {
 
 export const accounts = pgTable('accounts', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  studentId: integer('student_id')
+  studentID: integer('student_id')
     .notNull()
     .unique()
     .references(() => students.id, { onDelete: 'cascade' }),
@@ -60,13 +60,13 @@ export const studentsRelations = relations(students, ({ one }) => ({
   }),
   account: one(accounts, {
     fields: [students.id],
-    references: [accounts.studentId],
+    references: [accounts.studentID],
   }),
 }))
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   student: one(students, {
-    fields: [accounts.studentId],
+    fields: [accounts.studentID],
     references: [students.id],
   }),
 }))
