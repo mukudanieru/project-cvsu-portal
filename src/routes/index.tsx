@@ -1,42 +1,28 @@
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { getCurrentUserFn, logoutFn } from '@/server/auth'
+import { createFileRoute, useRouter, redirect } from '@tanstack/react-router'
+import { getCurrentUserFn } from '@/server/auth'
 import LoginPage from '@/components/LoginPage/LoginPage'
-import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/')({
   beforeLoad: async () => {
-    const user = await getCurrentUserFn()
+    const account = await getCurrentUserFn()
 
-    return { user }
+    if (account) {
+      throw redirect({ to: '/home' })
+    }
   },
 
   component: App,
 })
 
 function App() {
-  const { user } = Route.useRouteContext()
   const router = useRouter()
-
-  async function handleLogout() {
-    await logoutFn()
-    await router.invalidate()
-  }
 
   async function handleLoginSucess() {
     await router.invalidate()
   }
 
-  if (user) {
-    return (
-      <main className="relative min-h-screen">
-        <h1>Welcome, {user.universityEmail}!</h1>
-        <Button onClick={handleLogout}>Logout</Button>
-      </main>
-    )
-  }
-
   return (
-    <main className="relative min-h-screen overflow-hidden flex items-center justify-center p-6 md:p-10">
+    <main className="relative flex-1 overflow-hidden flex items-center justify-center p-6 md:p-10">
       <LoginPage onSuccess={handleLoginSucess} />
     </main>
   )

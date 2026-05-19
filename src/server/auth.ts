@@ -67,8 +67,6 @@ export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
 
     const [studentAccount] = await db
       .select({
-        id: accounts.id,
-        studentID: accounts.studentID,
         universityEmail: accounts.universityEmail,
       })
       .from(accounts)
