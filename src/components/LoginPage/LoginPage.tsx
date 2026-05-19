@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { ModeToggle } from '.././mode-toggle'
 import { Spinner } from '@/components/ui/spinner'
-import { AlertDestructive } from './ErrorMessage'
+import AlertDestructive from './ErrorMessage'
 import type { AlertDestructiveProps } from './ErrorMessage'
 
 import { useState } from 'react'
@@ -28,6 +28,8 @@ type Props = {
 const LoginPage = ({ onSuccess }: Props) => {
   const [studentNumber, setStudentNumber] = useState('')
   const [password, setPassword] = useState('')
+  const [studentNumberError, setStudentNumberError] = useState(false)
+  const [passwordError, setPasswordError] = useState(false)
   const [error, setError] = useState<AlertDestructiveProps | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -43,6 +45,12 @@ const LoginPage = ({ onSuccess }: Props) => {
 
     if (result.error) {
       setError(result.error)
+
+      if (result.error.description === 'Student number not found.') {
+        setStudentNumberError(true)
+      }
+
+      setPasswordError(true)
     } else {
       await onSuccess?.()
     }
@@ -52,8 +60,8 @@ const LoginPage = ({ onSuccess }: Props) => {
 
   return (
     <>
-      <div className="absolute inset-0 bg-[url(/background.jpg)] bg-cover bg-center blur-sm" />
-      <div className="absolute inset-0 bg-white/30 dark:bg-black/30" />
+      <div className="absolute inset-0 bg-[url(/background.jpg)] bg-cover bg-center blur-[3px]" />
+      <div className="absolute inset-0 bg-white/20 dark:bg-black/20" />
 
       <div className="absolute top-4 right-4 z-10">
         <ModeToggle />
@@ -86,10 +94,11 @@ const LoginPage = ({ onSuccess }: Props) => {
         <CardContent>
           <form onSubmit={handleLogin}>
             <FieldGroup>
-              <Field>
+              <Field data-invalid={studentNumberError}>
                 <FieldLabel htmlFor="studentNumber">Student Number</FieldLabel>
 
                 <Input
+                  aria-invalid={studentNumberError}
                   id="studentNumber"
                   name="studentNumber"
                   type="text"
@@ -97,19 +106,23 @@ const LoginPage = ({ onSuccess }: Props) => {
                   required
                   onChange={(e) => {
                     setStudentNumber(e.target.value)
+                    setStudentNumberError(false)
+                    setPasswordError(false)
                   }}
                 />
               </Field>
-              <Field>
+              <Field data-invalid={passwordError}>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
                 <Input
+                  aria-invalid={passwordError}
                   id="password"
                   type="password"
                   required
                   onChange={(e) => {
                     setPassword(e.target.value)
+                    setPasswordError(false)
                   }}
                 />
               </Field>

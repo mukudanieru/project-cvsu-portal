@@ -7,10 +7,7 @@ export type AlertDestructiveProps = {
   description: string
 }
 
-export function AlertDestructive({
-  title,
-  description,
-}: AlertDestructiveProps) {
+const AlertDestructive = ({ title, description }: AlertDestructiveProps) => {
   return (
     <Alert variant="destructive" className="max-w-md border-destructive">
       <AlertCircleIcon />
@@ -19,3 +16,5 @@ export function AlertDestructive({
     </Alert>
   )
 }
+
+export default AlertDestructive
