@@ -22,6 +22,7 @@ export const students = pgTable('students', {
   studentNumber: varchar('student_number', { length: 50 }).notNull().unique(),
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
+  middleName: varchar('middle_name', { length: 100 }).notNull(),
   courseId: integer('course_id').references(() => courses.id, {
     onDelete: 'set null',
   }),

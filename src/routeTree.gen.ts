@@ -11,7 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthedSubjectsRouteImport } from './routes/_authed/subjects'
+import { Route as AuthedSchedulesRouteImport } from './routes/_authed/schedules'
+import { Route as AuthedRegistrationFormRouteImport } from './routes/_authed/registration-form'
 import { Route as AuthedHomeRouteImport } from './routes/_authed/home'
+import { Route as AuthedGradesRouteImport } from './routes/_authed/grades'
+import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
 
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
@@ -22,32 +27,95 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedSubjectsRoute = AuthedSubjectsRouteImport.update({
+  id: '/subjects',
+  path: '/subjects',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedSchedulesRoute = AuthedSchedulesRouteImport.update({
+  id: '/schedules',
+  path: '/schedules',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedRegistrationFormRoute = AuthedRegistrationFormRouteImport.update({
+  id: '/registration-form',
+  path: '/registration-form',
+  getParentRoute: () => AuthedRoute,
+} as any)
 const AuthedHomeRoute = AuthedHomeRouteImport.update({
   id: '/home',
   path: '/home',
   getParentRoute: () => AuthedRoute,
 } as any)
+const AuthedGradesRoute = AuthedGradesRouteImport.update({
+  id: '/grades',
+  path: '/grades',
+  getParentRoute: () => AuthedRoute,
+} as any)
+const AuthedAccountRoute = AuthedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AuthedAccountRoute
+  '/grades': typeof AuthedGradesRoute
   '/home': typeof AuthedHomeRoute
+  '/registration-form': typeof AuthedRegistrationFormRoute
+  '/schedules': typeof AuthedSchedulesRoute
+  '/subjects': typeof AuthedSubjectsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AuthedAccountRoute
+  '/grades': typeof AuthedGradesRoute
   '/home': typeof AuthedHomeRoute
+  '/registration-form': typeof AuthedRegistrationFormRoute
+  '/schedules': typeof AuthedSchedulesRoute
+  '/subjects': typeof AuthedSubjectsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
+  '/_authed/account': typeof AuthedAccountRoute
+  '/_authed/grades': typeof AuthedGradesRoute
   '/_authed/home': typeof AuthedHomeRoute
+  '/_authed/registration-form': typeof AuthedRegistrationFormRoute
+  '/_authed/schedules': typeof AuthedSchedulesRoute
+  '/_authed/subjects': typeof AuthedSubjectsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/grades'
+    | '/home'
+    | '/registration-form'
+    | '/schedules'
+    | '/subjects'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home'
-  id: '__root__' | '/' | '/_authed' | '/_authed/home'
+  to:
+    | '/'
+    | '/account'
+    | '/grades'
+    | '/home'
+    | '/registration-form'
+    | '/schedules'
+    | '/subjects'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authed'
+    | '/_authed/account'
+    | '/_authed/grades'
+    | '/_authed/home'
+    | '/_authed/registration-form'
+    | '/_authed/schedules'
+    | '/_authed/subjects'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -71,6 +139,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/subjects': {
+      id: '/_authed/subjects'
+      path: '/subjects'
+      fullPath: '/subjects'
+      preLoaderRoute: typeof AuthedSubjectsRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/schedules': {
+      id: '/_authed/schedules'
+      path: '/schedules'
+      fullPath: '/schedules'
+      preLoaderRoute: typeof AuthedSchedulesRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/registration-form': {
+      id: '/_authed/registration-form'
+      path: '/registration-form'
+      fullPath: '/registration-form'
+      preLoaderRoute: typeof AuthedRegistrationFormRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/home': {
       id: '/_authed/home'
       path: '/home'
@@ -78,15 +167,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedHomeRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/grades': {
+      id: '/_authed/grades'
+      path: '/grades'
+      fullPath: '/grades'
+      preLoaderRoute: typeof AuthedGradesRouteImport
+      parentRoute: typeof AuthedRoute
+    }
+    '/_authed/account': {
+      id: '/_authed/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthedAccountRouteImport
+      parentRoute: typeof AuthedRoute
+    }
   }
 }
 
 interface AuthedRouteChildren {
+  AuthedAccountRoute: typeof AuthedAccountRoute
+  AuthedGradesRoute: typeof AuthedGradesRoute
   AuthedHomeRoute: typeof AuthedHomeRoute
+  AuthedRegistrationFormRoute: typeof AuthedRegistrationFormRoute
+  AuthedSchedulesRoute: typeof AuthedSchedulesRoute
+  AuthedSubjectsRoute: typeof AuthedSubjectsRoute
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
+  AuthedAccountRoute: AuthedAccountRoute,
+  AuthedGradesRoute: AuthedGradesRoute,
   AuthedHomeRoute: AuthedHomeRoute,
+  AuthedRegistrationFormRoute: AuthedRegistrationFormRoute,
+  AuthedSchedulesRoute: AuthedSchedulesRoute,
+  AuthedSubjectsRoute: AuthedSubjectsRoute,
 }
 
 const AuthedRouteWithChildren =

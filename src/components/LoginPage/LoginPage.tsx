@@ -19,7 +19,7 @@ import AlertDestructive from './ErrorMessage'
 import type { AlertDestructiveProps } from './ErrorMessage'
 
 import { useState } from 'react'
-import { loginFn } from '@/server/auth'
+import { loginFn } from '#/server/auth/auth.functions'
 
 type Props = {
   onSuccess?: () => void | Promise<void>

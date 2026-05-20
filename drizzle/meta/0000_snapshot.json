@@ -1,5 +1,5 @@
 {
-  "id": "8136b26d-231e-42a8-86d8-6ad71dcb2539",
+  "id": "ee914a63-e563-41b2-a461-f0312588ead6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -172,6 +172,12 @@
         },
         "last_name": {
           "name": "last_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "middle_name": {
+          "name": "middle_name",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true

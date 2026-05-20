@@ -1,10 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
-import { students, accounts } from '@/db/schema'
 import { verifyPassword } from '@/lib/password'
 import { useAppSession } from '@/lib/session'
-import { db } from '@/db/drizzle'
-import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+
+import {
+  findStudentByStudentNumber,
+  getCurrentUserFromSession,
+} from './auth.server'
 
 const loginSchema = z.object({
   studentNumber: z.string(),
@@ -14,12 +16,7 @@ const loginSchema = z.object({
 export const loginFn = createServerFn({ method: 'POST' })
   .inputValidator(loginSchema)
   .handler(async ({ data }) => {
-    const studentAccount = await db.query.students.findFirst({
-      where: eq(students.studentNumber, data.studentNumber),
-      with: {
-        account: true,
-      },
-    })
+    const studentAccount = await findStudentByStudentNumber(data.studentNumber)
 
     if (!studentAccount) {
       return {
@@ -58,21 +55,5 @@ export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
 })
 
 export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(
-  async () => {
-    const session = await useAppSession()
-
-    if (!session.data.accountID) return null
-
-    const accountID = Number(session.data.accountID)
-
-    const [studentAccount] = await db
-      .select({
-        universityEmail: accounts.universityEmail,
-      })
-      .from(accounts)
-      .where(eq(accounts.id, accountID))
-      .limit(1)
-
-    return studentAccount
-  },
+  getCurrentUserFromSession,
 )

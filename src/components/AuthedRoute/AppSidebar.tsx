@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 
 import { Link } from '@tanstack/react-router'
+import { NavUser } from './NavUser'
 
 const navMain = [
   {
@@ -41,12 +42,23 @@ const navMain = [
   },
   {
     title: 'Virtual Reg Form',
-    url: '/registration_form',
+    url: '/registration-form',
     icon: FileText,
   },
 ]
 
-export function AppSidebar() {
+type User = {
+  name: string
+  studentNumber: string
+  avatar: string
+}
+
+type NavUserProps = {
+  user: User
+  handleLogout: () => Promise<void>
+}
+
+export function AppSidebar({ user, handleLogout }: NavUserProps) {
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader>
@@ -74,7 +86,9 @@ export function AppSidebar() {
         <NavMain items={navMain} />
       </SidebarContent>
 
-      <SidebarFooter></SidebarFooter>
+      <SidebarFooter>
+        <NavUser user={user} handleLogout={handleLogout} />
+      </SidebarFooter>
     </Sidebar>
   )
 }
