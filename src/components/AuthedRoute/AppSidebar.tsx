@@ -15,6 +15,7 @@ import {
   Captions,
   FileText,
 } from 'lucide-react'
+import AlertDestructive from '@/components/ErrorComponents/ErrorMessage'
 
 import { Link } from '@tanstack/react-router'
 import { NavUser } from './NavUser'
@@ -54,11 +55,12 @@ type User = {
 }
 
 type NavUserProps = {
-  user: User
+  user: User | null
+  error: { title: string; description: string } | null
   handleLogout: () => Promise<void>
 }
 
-export function AppSidebar({ user, handleLogout }: NavUserProps) {
+export function AppSidebar({ user, error, handleLogout }: NavUserProps) {
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader>
@@ -83,7 +85,13 @@ export function AppSidebar({ user, handleLogout }: NavUserProps) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={navMain} />
+        {error ? (
+          <div className="p-4">
+            <AlertDestructive {...error} />
+          </div>
+        ) : (
+          <NavMain items={navMain} />
+        )}
       </SidebarContent>
 
       <SidebarFooter>

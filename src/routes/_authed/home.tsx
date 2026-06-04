@@ -9,7 +9,7 @@ function RouteComponent() {
 
   return (
     <div className="">
-      <h1>Welcome, {account.universityEmail}!</h1>
+      <h1>Welcome, {account}!</h1>
     </div>
   )
 }

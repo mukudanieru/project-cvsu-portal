@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getStudentNavInformation } from './account.server'
+import { getStudentInformation } from './account.server'
 import { getCurrentUserFromSession } from '../auth/auth.server'
 
 export const getNavInformation = createServerFn({ method: 'GET' }).handler(
@@ -7,15 +7,29 @@ export const getNavInformation = createServerFn({ method: 'GET' }).handler(
     const currentAccountID = await getCurrentUserFromSession()
 
     if (!currentAccountID) {
-      throw new Error('Unauthorized')
+      return {
+        error: {
+          title: 'Unauthorized',
+          description: 'You must be logged in to access this resource.',
+        },
+      }
     }
 
-    const studentInformation = await getStudentNavInformation(currentAccountID)
+    const studentInformation = await getStudentInformation(currentAccountID)
+
+    if (!studentInformation) {
+      return {
+        error: {
+          title: 'Student Not Found',
+          description: 'No student record is associated with this account.',
+        },
+      }
+    }
 
     return {
       accountID: currentAccountID,
-      studentNumber: studentInformation.studentNumber,
-      fullName: `${studentInformation.firstName} ${studentInformation.lastName}`,
+      studentNumber: studentInformation.students.studentNumber,
+      fullName: `${studentInformation.students.firstName} ${studentInformation.students.lastName}`,
     }
   },
 )

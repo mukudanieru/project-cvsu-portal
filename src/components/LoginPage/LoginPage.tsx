@@ -15,8 +15,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { ModeToggle } from '.././mode-toggle'
 import { Spinner } from '@/components/ui/spinner'
-import AlertDestructive from './ErrorMessage'
-import type { AlertDestructiveProps } from './ErrorMessage'
+import AlertDestructive from '@/components/ErrorComponents/ErrorMessage'
+import type { AlertDestructiveProps } from '@/components/ErrorComponents/ErrorMessage'
 
 import { useState } from 'react'
 import { loginFn } from '#/server/auth/auth.functions'

@@ -29,12 +29,7 @@ export const Route = createFileRoute('/_authed')({
 
   loader: async () => {
     const navInformation = await getNavInformation()
-
-    return {
-      name: navInformation.fullName,
-      studentNumber: navInformation.studentNumber,
-      avatar: 'https://github.com/shadcn.png',
-    }
+    return navInformation
   },
 
   component: AuthedComponent,
@@ -42,16 +37,26 @@ export const Route = createFileRoute('/_authed')({
 
 function AuthedComponent() {
   const router = useRouter()
-  const user = Route.useLoaderData()
+  const data = Route.useLoaderData()
 
   async function handleLogout() {
     await logoutFn()
     await router.invalidate()
   }
 
+  const user = !('error' in data)
+    ? {
+        name: data.fullName,
+        studentNumber: data.studentNumber,
+        avatar: 'https://github.com/shadcn.png',
+      }
+    : null
+
+  const error = 'error' in data ? (data.error ?? null) : null
+
   return (
     <SidebarProvider>
-      <AppSidebar user={user} handleLogout={handleLogout} />
+      <AppSidebar user={user} error={error} handleLogout={handleLogout} />
       <SidebarInset className="overflow-hidden">
         <header className="flex h-16 shrink-0 justify-between items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4 h-6">
