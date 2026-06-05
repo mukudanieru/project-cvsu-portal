@@ -14,7 +14,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedSubjectsRouteImport } from './routes/_authed/subjects'
 import { Route as AuthedSchedulesRouteImport } from './routes/_authed/schedules'
 import { Route as AuthedRegistrationFormRouteImport } from './routes/_authed/registration-form'
-import { Route as AuthedHomeRouteImport } from './routes/_authed/home'
 import { Route as AuthedGradesRouteImport } from './routes/_authed/grades'
 import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
 
@@ -42,11 +41,6 @@ const AuthedRegistrationFormRoute = AuthedRegistrationFormRouteImport.update({
   path: '/registration-form',
   getParentRoute: () => AuthedRoute,
 } as any)
-const AuthedHomeRoute = AuthedHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => AuthedRoute,
-} as any)
 const AuthedGradesRoute = AuthedGradesRouteImport.update({
   id: '/grades',
   path: '/grades',
@@ -62,7 +56,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AuthedAccountRoute
   '/grades': typeof AuthedGradesRoute
-  '/home': typeof AuthedHomeRoute
   '/registration-form': typeof AuthedRegistrationFormRoute
   '/schedules': typeof AuthedSchedulesRoute
   '/subjects': typeof AuthedSubjectsRoute
@@ -71,7 +64,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AuthedAccountRoute
   '/grades': typeof AuthedGradesRoute
-  '/home': typeof AuthedHomeRoute
   '/registration-form': typeof AuthedRegistrationFormRoute
   '/schedules': typeof AuthedSchedulesRoute
   '/subjects': typeof AuthedSubjectsRoute
@@ -82,7 +74,6 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren
   '/_authed/account': typeof AuthedAccountRoute
   '/_authed/grades': typeof AuthedGradesRoute
-  '/_authed/home': typeof AuthedHomeRoute
   '/_authed/registration-form': typeof AuthedRegistrationFormRoute
   '/_authed/schedules': typeof AuthedSchedulesRoute
   '/_authed/subjects': typeof AuthedSubjectsRoute
@@ -93,7 +84,6 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/grades'
-    | '/home'
     | '/registration-form'
     | '/schedules'
     | '/subjects'
@@ -102,7 +92,6 @@ export interface FileRouteTypes {
     | '/'
     | '/account'
     | '/grades'
-    | '/home'
     | '/registration-form'
     | '/schedules'
     | '/subjects'
@@ -112,7 +101,6 @@ export interface FileRouteTypes {
     | '/_authed'
     | '/_authed/account'
     | '/_authed/grades'
-    | '/_authed/home'
     | '/_authed/registration-form'
     | '/_authed/schedules'
     | '/_authed/subjects'
@@ -160,13 +148,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRegistrationFormRouteImport
       parentRoute: typeof AuthedRoute
     }
-    '/_authed/home': {
-      id: '/_authed/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof AuthedHomeRouteImport
-      parentRoute: typeof AuthedRoute
-    }
     '/_authed/grades': {
       id: '/_authed/grades'
       path: '/grades'
@@ -187,7 +168,6 @@ declare module '@tanstack/react-router' {
 interface AuthedRouteChildren {
   AuthedAccountRoute: typeof AuthedAccountRoute
   AuthedGradesRoute: typeof AuthedGradesRoute
-  AuthedHomeRoute: typeof AuthedHomeRoute
   AuthedRegistrationFormRoute: typeof AuthedRegistrationFormRoute
   AuthedSchedulesRoute: typeof AuthedSchedulesRoute
   AuthedSubjectsRoute: typeof AuthedSubjectsRoute
@@ -196,7 +176,6 @@ interface AuthedRouteChildren {
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAccountRoute: AuthedAccountRoute,
   AuthedGradesRoute: AuthedGradesRoute,
-  AuthedHomeRoute: AuthedHomeRoute,
   AuthedRegistrationFormRoute: AuthedRegistrationFormRoute,
   AuthedSchedulesRoute: AuthedSchedulesRoute,
   AuthedSubjectsRoute: AuthedSubjectsRoute,

@@ -70,7 +70,7 @@ export function AppSidebar({ user, error, handleLogout }: NavUserProps) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <Link to="/home">
+              <Link to="/account">
                 <div className="w-6 h-6 md:w-7 md:h-8 drop-shadow-lg">
                   <img
                     src="./logo.png"
