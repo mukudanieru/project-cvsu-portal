@@ -1,0 +1,1 @@
+ALTER TABLE "students" ALTER COLUMN "middle_name" DROP DEFAULT;

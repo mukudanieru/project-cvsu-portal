@@ -7,7 +7,7 @@ export const Route = createFileRoute('/')({
     const account = await getCurrentUserFn()
 
     if (account) {
-      throw redirect({ to: '/home' })
+      throw redirect({ to: '/account' })
     }
   },
 

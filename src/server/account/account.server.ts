@@ -15,7 +15,6 @@ export async function getStudentInformation(
         firstName: students.firstName,
         lastName: students.lastName,
         middleName: students.middleName,
-        courseId: students.courseId,
         studentStatus: students.studentStatus,
         sex: students.sex,
         address: students.address,
