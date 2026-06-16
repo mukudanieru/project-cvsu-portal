@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 import { ChevronsUpDown, LogOut } from 'lucide-react'
+import { getInitials } from '@/lib/utils/name'
 
 type User = {
   name: string
@@ -26,6 +27,8 @@ type NavUserProps = {
 }
 
 export function NavUser({ user, handleLogout }: NavUserProps) {
+  const initials = user ? getInitials(user.name) : null
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -37,7 +40,9 @@ export function NavUser({ user, handleLogout }: NavUserProps) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {initials}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user?.name}</span>

@@ -68,7 +68,7 @@ function AuthedComponent() {
             <ModeToggle />
           </div>
         </header>
-        <main className="p-4">
+        <main className="flex-1 p-4 overflow-hidden flex justify-center items-center">
           <Outlet />
         </main>
       </SidebarInset>

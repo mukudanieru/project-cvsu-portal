@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getStudentInformation } from './account.server'
 import { getCurrentUserFromSession } from '../auth/auth.server'
+import { capitalize } from '@/lib/utils/name'
 
 export const getNavInformation = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -70,15 +71,27 @@ export const getAccountInformation = createServerFn({ method: 'GET' }).handler(
       .filter(Boolean)
       .join(' ')
 
+    const birthday = new Date(
+      studentInformation.students.birthday,
+    ).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+
+    const relationshipStatus = studentInformation.students.relationshipStatus
+      ? capitalize(studentInformation.students.relationshipStatus)
+      : null
+
     return {
       universityEmail: studentInformation.accounts.universityEmail,
       studentNumber: studentInformation.students.studentNumber,
-      fullName: fullName,
-      studentStatus: studentInformation.students.studentStatus,
+      fullName,
+      studentStatus: capitalize(studentInformation.students.studentStatus),
       sex: studentInformation.students.sex,
       address: studentInformation.students.address,
-      relationshipStatus: studentInformation.students.relationshipStatus,
-      birthday: studentInformation.students.birthday,
+      relationshipStatus,
+      birthday,
       citizenship: studentInformation.students.citizenship,
       guardian: studentInformation.students.guardian,
       courseCode: studentInformation.course?.courseCode,
