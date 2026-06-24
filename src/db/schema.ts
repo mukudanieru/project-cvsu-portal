@@ -1,4 +1,13 @@
-import { integer, pgEnum, pgTable, varchar, date } from 'drizzle-orm/pg-core'
+import {
+  uuid,
+  integer,
+  decimal,
+  pgEnum,
+  pgTable,
+  varchar,
+  date,
+  time,
+} from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
 // Enums
@@ -9,23 +18,65 @@ export const studentStatusEnum = pgEnum('student_status', [
 
 export const sexEnum = pgEnum('sex', ['male', 'female'])
 
+export const academicTermEnum = pgEnum('academic_term', [
+  'first',
+  'second',
+  'summer',
+])
+
+export const dayEnum = pgEnum('day', [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+])
+
+export const classModeEnum = pgEnum('class_mode', [
+  'synchronous',
+  'asynchronous',
+])
+
 // Tables
+export const departments = pgTable('departments', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  name: varchar('name', { length: 100 }).notNull().unique(),
+})
+
 export const courses = pgTable('courses', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   courseCode: varchar('course_code', { length: 50 }).notNull().unique(),
   courseName: varchar('course_name', { length: 255 }).notNull(),
-  department: varchar('department', { length: 100 }).notNull(),
+  departmentId: integer('department_id')
+    .notNull()
+    .references(() => departments.id),
+})
+
+export const accounts = pgTable('accounts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  studentId: uuid('student_id')
+    .notNull()
+    .unique()
+    .references(() => students.id, { onDelete: 'cascade' }),
+  universityEmail: varchar('university_email', { length: 255 })
+    .notNull()
+    .unique(),
+  passwordHash: varchar('password_hash', { length: 255 }).notNull(),
 })
 
 export const students = pgTable('students', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  id: uuid('id').primaryKey().defaultRandom(),
   studentNumber: varchar('student_number', { length: 50 }).notNull().unique(),
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
   middleName: varchar('middle_name', { length: 100 }),
-  courseId: integer('course_id').references(() => courses.id, {
-    onDelete: 'set null',
-  }),
+  courseId: integer('course_id')
+    .references(() => courses.id)
+    .notNull(),
+  sectionId: integer('section_id')
+    .references(() => sections.id)
+    .notNull(),
   studentStatus: studentStatusEnum('student_status')
     .default('regular')
     .notNull(),
@@ -37,16 +88,83 @@ export const students = pgTable('students', {
   guardian: varchar('guardian', { length: 255 }),
 })
 
-export const accounts = pgTable('accounts', {
+export const faculty = pgTable('faculty', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  studentID: integer('student_id')
-    .notNull()
-    .unique()
-    .references(() => students.id, { onDelete: 'cascade' }),
-  universityEmail: varchar('university_email', { length: 255 })
-    .notNull()
+  facultyNumber: varchar('faculty_number', { length: 50 }).notNull().unique(),
+  firstName: varchar('first_name', { length: 100 }).notNull(),
+  lastName: varchar('last_name', { length: 100 }).notNull(),
+  email: varchar('faculty_email', { length: 255 }).notNull().unique(),
+})
+
+export const academicPeriods = pgTable('academic_periods', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  startYear: integer('start_year').notNull(),
+  endYear: integer('end_year').notNull(),
+  term: academicTermEnum('term').notNull(),
+})
+
+export const sections = pgTable('sections', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  programCode: varchar('program_code', { length: 24 }).notNull(),
+  yearLevel: integer('year_level').notNull(),
+  sectionNumber: integer('section_number').notNull(),
+  facultyId: integer('faculty_id')
+    .references(() => faculty.id)
+    .notNull(),
+})
+
+export const subjects = pgTable('subjects', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  subjectCode: varchar('subject_code', { length: 50 }).notNull(),
+  subjectName: varchar('subject_name', { length: 100 }).notNull(),
+  units: integer('units').notNull(),
+})
+
+export const subjectOfferings = pgTable('subject_offerings', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  subjectId: integer('subject_id')
+    .references(() => subjects.id)
+    .notNull(),
+  sectionId: integer('section_id')
+    .references(() => sections.id)
+    .notNull(),
+  periodId: integer('period_id')
+    .references(() => academicPeriods.id)
+    .notNull(),
+  facultyId: integer('faculty_id')
+    .references(() => faculty.id)
+    .notNull(),
+  scheduleCode: varchar('schedule_code', { length: 50 }),
+  slots: integer('slots'),
+})
+
+export const offeringSchedules = pgTable('offering_schedules', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  subjectOfferingId: integer('subject_offering_id')
+    .references(() => subjectOfferings.id)
+    .notNull(),
+  classMode: classModeEnum('class_mode').default('synchronous').notNull(),
+  day: dayEnum('day').notNull(),
+  timeStart: time('time_start').notNull(),
+  timeEnd: time('time_end').notNull(),
+})
+
+export const enrollments = pgTable('enrollments', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  studentId: uuid('student_id')
+    .references(() => students.id)
+    .notNull(),
+  subjectOfferingId: integer('subject_offering_id')
+    .references(() => subjectOfferings.id)
+    .notNull(),
+})
+
+export const grades = pgTable('grades', {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  enrollmentId: integer('enrollment_id')
+    .references(() => enrollments.id)
     .unique(),
-  passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+  finalGrade: decimal('final_grade'),
 })
 
 // Relations
@@ -61,13 +179,13 @@ export const studentsRelations = relations(students, ({ one }) => ({
   }),
   account: one(accounts, {
     fields: [students.id],
-    references: [accounts.studentID],
+    references: [accounts.studentId],
   }),
 }))
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   student: one(students, {
-    fields: [accounts.studentID],
+    fields: [accounts.studentId],
     references: [students.id],
   }),
 }))

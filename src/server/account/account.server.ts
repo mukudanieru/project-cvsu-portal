@@ -1,9 +1,9 @@
-import { students, accounts, courses } from '@/db/schema'
+import { students, accounts, courses, departments } from '@/db/schema'
 import { db } from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
 
 export async function getStudentInformation(
-  accountID: number,
+  accountID: string,
 ): Promise<(typeof student)[0] | null> {
   const student = await db
     .select({
@@ -26,12 +26,15 @@ export async function getStudentInformation(
       course: {
         courseCode: courses.courseCode,
         courseName: courses.courseName,
-        department: courses.department,
+      },
+      department: {
+        name: departments.name,
       },
     })
     .from(accounts)
-    .innerJoin(students, eq(accounts.studentID, students.id))
+    .innerJoin(students, eq(accounts.studentId, students.id))
     .leftJoin(courses, eq(students.courseId, courses.id))
+    .leftJoin(departments, eq(courses.departmentId, departments.id))
     .where(eq(accounts.id, accountID))
     .limit(1)
 

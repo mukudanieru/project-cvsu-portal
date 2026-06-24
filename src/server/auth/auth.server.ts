@@ -13,5 +13,5 @@ export async function findStudentByStudentNumber(studentNumber: string) {
 export async function getCurrentUserFromSession() {
   const session = await useAppSession()
   if (!session.data.accountID) return null
-  return Number(session.data.accountID)
+  return session.data.accountID
 }

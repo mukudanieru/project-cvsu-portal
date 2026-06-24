@@ -96,7 +96,7 @@ export const getAccountInformation = createServerFn({ method: 'GET' }).handler(
       guardian: studentInformation.students.guardian,
       courseCode: studentInformation.course?.courseCode,
       courseName: studentInformation.course?.courseName,
-      department: studentInformation.course?.department,
+      department: studentInformation.department?.name,
     }
   },
 )
