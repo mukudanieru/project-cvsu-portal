@@ -1,21 +1,22 @@
 import {
   enrollments,
-  faculty,
-  subjectOfferings,
   subjects,
+  subjectOfferings,
+  offeringSchedules,
   academicPeriods,
 } from '@/db/schema'
 import { db } from '@/db/drizzle'
 import { eq, and } from 'drizzle-orm'
 
-export async function getEnrolledSubjects(studentID: string) {
+export async function getSubjectOfferingSchedules(studentID: string) {
   return await db
     .select({
-      subjectName: subjects.subjectName,
       subjectCode: subjects.subjectCode,
-      scheduleCode: subjectOfferings.scheduleCode,
-      facultyFirstName: faculty.firstName,
-      facultyLastName: faculty.lastName,
+      subjectName: subjects.subjectName,
+      day: offeringSchedules.day,
+      timeStart: offeringSchedules.timeStart,
+      timeEnd: offeringSchedules.timeEnd,
+      classMode: offeringSchedules.classMode,
     })
     .from(enrollments)
     .innerJoin(
@@ -27,7 +28,10 @@ export async function getEnrolledSubjects(studentID: string) {
       eq(academicPeriods.id, subjectOfferings.periodId),
     )
     .innerJoin(subjects, eq(subjects.id, subjectOfferings.subjectId))
-    .innerJoin(faculty, eq(faculty.id, subjectOfferings.facultyId))
+    .innerJoin(
+      offeringSchedules,
+      eq(offeringSchedules.subjectOfferingId, subjectOfferings.id),
+    )
     .where(
       and(
         eq(enrollments.studentId, studentID),

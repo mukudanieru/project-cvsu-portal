@@ -7,6 +7,7 @@ import {
   varchar,
   date,
   time,
+  boolean,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -101,6 +102,7 @@ export const academicPeriods = pgTable('academic_periods', {
   startYear: integer('start_year').notNull(),
   endYear: integer('end_year').notNull(),
   term: academicTermEnum('term').notNull(),
+  isCurrent: boolean('is_current').notNull().default(false),
 })
 
 export const sections = pgTable('sections', {
@@ -110,12 +112,13 @@ export const sections = pgTable('sections', {
   sectionNumber: integer('section_number').notNull(),
   facultyId: integer('faculty_id')
     .references(() => faculty.id)
-    .notNull(),
+    .notNull()
+    .unique(),
 })
 
 export const subjects = pgTable('subjects', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  subjectCode: varchar('subject_code', { length: 50 }).notNull(),
+  subjectCode: varchar('subject_code', { length: 50 }).notNull().unique(),
   subjectName: varchar('subject_name', { length: 100 }).notNull(),
   units: integer('units').notNull(),
 })
@@ -134,7 +137,7 @@ export const subjectOfferings = pgTable('subject_offerings', {
   facultyId: integer('faculty_id')
     .references(() => faculty.id)
     .notNull(),
-  scheduleCode: varchar('schedule_code', { length: 50 }),
+  scheduleCode: varchar('schedule_code', { length: 50 }).notNull().unique(),
   slots: integer('slots'),
 })
 
