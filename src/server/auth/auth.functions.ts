@@ -42,8 +42,10 @@ export const loginFn = createServerFn({ method: 'POST' })
     }
 
     const session = await useAppSession()
-    await session.update({ accountID: studentAccount.account.id })
-    console.log(session.data.accountID)
+    await session.update({
+      accountID: studentAccount.account.id,
+      studentID: studentAccount.id,
+    })
 
     return { success: true }
   })

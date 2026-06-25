@@ -2,6 +2,7 @@ import { useSession } from '@tanstack/react-start/server'
 
 type SessionData = {
   accountID: string
+  studentID: string
 }
 
 export function useAppSession() {

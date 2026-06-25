@@ -10,8 +10,14 @@ export async function findStudentByStudentNumber(studentNumber: string) {
   })
 }
 
-export async function getCurrentUserFromSession() {
+export async function getCurrentUserFromSession(): Promise<{
+  accountID: string
+  studentID: string
+} | null> {
   const session = await useAppSession()
-  if (!session.data.accountID) return null
-  return session.data.accountID
+  const { accountID, studentID } = session.data
+
+  if (!accountID || !studentID) return null
+
+  return { accountID, studentID }
 }

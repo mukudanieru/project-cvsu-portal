@@ -5,9 +5,9 @@ import { capitalize } from '@/lib/utils/name'
 
 export const getNavInformation = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const currentAccountID = await getCurrentUserFromSession()
+    const currentUser = await getCurrentUserFromSession()
 
-    if (!currentAccountID) {
+    if (!currentUser) {
       return {
         error: {
           title: 'Unauthorized',
@@ -16,7 +16,9 @@ export const getNavInformation = createServerFn({ method: 'GET' }).handler(
       }
     }
 
-    const studentInformation = await getStudentInformation(currentAccountID)
+    const studentInformation = await getStudentInformation(
+      currentUser.accountID,
+    )
 
     if (!studentInformation) {
       return {
@@ -28,7 +30,7 @@ export const getNavInformation = createServerFn({ method: 'GET' }).handler(
     }
 
     return {
-      accountID: currentAccountID,
+      accountID: currentUser.accountID,
       studentNumber: studentInformation.students.studentNumber,
       fullName: `${studentInformation.students.firstName} ${studentInformation.students.lastName}`,
     }
@@ -37,9 +39,9 @@ export const getNavInformation = createServerFn({ method: 'GET' }).handler(
 
 export const getAccountInformation = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const currentAccountID = await getCurrentUserFromSession()
+    const currentUser = await getCurrentUserFromSession()
 
-    if (!currentAccountID) {
+    if (!currentUser) {
       return {
         error: {
           title: 'Unauthorized',
@@ -48,7 +50,9 @@ export const getAccountInformation = createServerFn({ method: 'GET' }).handler(
       }
     }
 
-    const studentInformation = await getStudentInformation(currentAccountID)
+    const studentInformation = await getStudentInformation(
+      currentUser.accountID,
+    )
 
     if (!studentInformation) {
       return {
