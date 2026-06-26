@@ -40,5 +40,5 @@ export const getEnrolledSubjectsForCurrentUser = createServerFn({
     }
   }
 
-  return { currentPeriod, studentSubjects }
+  return { currentPeriod: currentPeriod[0], studentSubjects }
 })
