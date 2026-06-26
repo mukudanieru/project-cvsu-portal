@@ -1,30 +1,27 @@
+import WarningMessage from '#/components/ErrorComponents/WarningMessage'
+
 import { getEnrolledSubjectsForCurrentUser } from '#/server/subject/subject.functions'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_authed/subjects')({
   loader: async () => {
-    const enrolledSubjects = await getEnrolledSubjectsForCurrentUser()
-
-    if ('error' in enrolledSubjects) {
-      throw redirect({
-        to: '/',
-      })
-    }
-
-    return enrolledSubjects
+    return await getEnrolledSubjectsForCurrentUser()
   },
 
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const data = Route.useLoaderData()
+  const subjects = Route.useLoaderData()
+
+  if ('error' in subjects) {
+    return <WarningMessage error={subjects.error} />
+  }
 
   return (
     <>
-      {/* <div>Hello "/_authed/subjects"!</div> */}
       <div>
-        {data.map((item) => (
+        {subjects.map((item) => (
           <div key={item.scheduleCode}>
             <h3>{item.subjectName}</h3>
             <p>Code: {item.subjectCode}</p>

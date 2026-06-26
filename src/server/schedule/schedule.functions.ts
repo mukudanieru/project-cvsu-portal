@@ -23,8 +23,9 @@ export const getSubjectOfferingSchedulesForCurrentUser = createServerFn({
   if (studentSchedules.length === 0) {
     return {
       error: {
-        title: 'No Subjects Found',
-        description: 'You are not enrolled in any subjects.',
+        title: 'No Schedule Available',
+        description:
+          'Your subjects have no assigned schedule yet. Check back later or contact your department for more information.',
       },
     }
   }

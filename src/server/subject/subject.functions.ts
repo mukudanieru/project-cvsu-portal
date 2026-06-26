@@ -21,8 +21,9 @@ export const getEnrolledSubjectsForCurrentUser = createServerFn({
   if (studentSubjects.length === 0) {
     return {
       error: {
-        title: 'No Subjects Found',
-        description: 'You are not enrolled in any subjects.',
+        title: 'No Subjects Enrolled',
+        description:
+          'You have no subjects enrolled for the current semester. Please contact your registrar if you believe this is a mistake.',
       },
     }
   }
