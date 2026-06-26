@@ -35,3 +35,14 @@ export async function getEnrolledSubjects(studentID: string) {
       ),
     )
 }
+
+export async function getCurrentPeriod() {
+  return await db
+    .select({
+      startYear: academicPeriods.startYear,
+      endYear: academicPeriods.endYear,
+      term: academicPeriods.term,
+    })
+    .from(academicPeriods)
+    .where(eq(academicPeriods.isCurrent, true))
+}

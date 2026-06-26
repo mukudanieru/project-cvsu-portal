@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getEnrolledSubjects } from './subject.server'
+import { getCurrentPeriod, getEnrolledSubjects } from './subject.server'
 import { getCurrentUserFromSession } from '../auth/auth.server'
 
 export const getEnrolledSubjectsForCurrentUser = createServerFn({
@@ -16,6 +16,18 @@ export const getEnrolledSubjectsForCurrentUser = createServerFn({
     }
   }
 
+  const currentPeriod = await getCurrentPeriod()
+
+  if (currentPeriod.length === 0) {
+    return {
+      error: {
+        title: 'Academic Period Unavailable',
+        description:
+          'The current academic period has not been configured yet. Please contact the Registrar for assistance.',
+      },
+    }
+  }
+
   const studentSubjects = await getEnrolledSubjects(currentUser.studentID)
 
   if (studentSubjects.length === 0) {
@@ -28,5 +40,5 @@ export const getEnrolledSubjectsForCurrentUser = createServerFn({
     }
   }
 
-  return studentSubjects
+  return { currentPeriod, studentSubjects }
 })

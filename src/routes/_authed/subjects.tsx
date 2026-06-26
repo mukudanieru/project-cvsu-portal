@@ -14,24 +14,13 @@ export const Route = createFileRoute('/_authed/subjects')({
 function RouteComponent() {
   const subjects = Route.useLoaderData()
 
-  if ('error' in subjects) {
+  if (subjects.error) {
     return <WarningMessage error={subjects.error} />
   }
 
   return (
     <>
-      <div>
-        {subjects.map((item) => (
-          <div key={item.scheduleCode}>
-            <h3>{item.subjectName}</h3>
-            <p>Code: {item.subjectCode}</p>
-            <p>Schedule: {item.scheduleCode}</p>
-            <p>
-              Faculty: {item.facultyFirstName} {item.facultyLastName}
-            </p>
-          </div>
-        ))}
-      </div>
+      <pre>{JSON.stringify(subjects, null, 2)}</pre>
     </>
   )
 }
