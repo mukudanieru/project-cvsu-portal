@@ -1,3 +1,4 @@
+import TitleSection from '#/components/AuthedRoute/TitleSection'
 import { Badge } from '#/components/ui/badge'
 
 type Term = 'first' | 'second' | 'summer'
@@ -30,9 +31,7 @@ const SubjectsPage = ({ subjectsInfo }: SubjectsPageProps) => {
   return (
     <div className="flex w-full max-w-3xl flex-col gap-6 px-8 py-10">
       <div className="flex flex-col gap-5">
-        <h1 className="text-4xl font-extrabold tracking-tight text-balance">
-          Enrolled Subjects
-        </h1>
+        <TitleSection title={'Enrolled Subjects'} />
 
         <div className="flex justify-between text-l font-medium">
           <div>
