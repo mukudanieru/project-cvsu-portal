@@ -6,7 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Calendar, Clock } from 'lucide-react'
+import { Calendar } from 'lucide-react'
+import ScheduleItem from './ScheduleItem'
 
 const ScheduleMobileList = ({
   groupedScheduleData,
@@ -30,40 +31,15 @@ const ScheduleMobileList = ({
                 {day}
               </CardTitle>
 
-              <CardDescription className="flex gap-4 items-center">
+              <CardDescription className="flex gap-4 items-center text-foreground/75">
                 {items.length} {items.length > 1 ? 'classes' : 'class'}
               </CardDescription>
             </CardHeader>
 
             <CardContent className="-mb-(--card-spacing) p-2.5 bg-accent">
-              {items.map((item, idx) => {
-                return (
-                  <Card
-                    key={`${item.subjectCode}-${idx}`}
-                    className="border border-primary/25 mb-2 p-0 gap-0"
-                  >
-                    <CardHeader className=" bg-primary px-3.5 py-1.5">
-                      <CardTitle className="capitalize text-xs font-normal">
-                        {item.subjectCode} · {item.classMode}
-                      </CardTitle>
-                    </CardHeader>
-
-                    <CardContent className="px-3.5 py-3">
-                      <h1 className="uppercase text-md font-medium">
-                        {item.subjectName}
-                      </h1>
-
-                      <div className="flex gap-5 items-center text-foreground/50">
-                        <Clock size={14} />
-
-                        <div>
-                          {item.timeStart} - {item.timeEnd}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+              {items.map((item, idx) => (
+                <ScheduleItem key={`${item.subjectCode}-${idx}`} item={item} />
+              ))}
             </CardContent>
           </Card>
         )

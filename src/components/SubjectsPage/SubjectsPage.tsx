@@ -37,7 +37,10 @@ const SubjectsPage = ({ subjectsInfo }: SubjectsPageProps) => {
           <div>
             School Year: {currentPeriod?.startYear} - {currentPeriod?.endYear}
           </div>
-          <div>Semester: {currentPeriod?.term}</div>
+          <div>
+            Semester:{' '}
+            <span className="capitalize">{currentPeriod?.term}</span>{' '}
+          </div>
         </div>
       </div>
 

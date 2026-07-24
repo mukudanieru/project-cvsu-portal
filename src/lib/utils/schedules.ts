@@ -18,7 +18,7 @@ export interface ScheduleItem {
   classMode: ClassMode
 }
 
-interface ParsedScheduleItem {
+export interface ParsedScheduleItem {
   subjectCode: string
   subjectName: string
   timeStart: string // "HH:MM AM or PM" - Standard Time

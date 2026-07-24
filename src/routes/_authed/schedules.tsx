@@ -14,8 +14,6 @@ export const Route = createFileRoute('/_authed/schedules')({
 function RouteComponent() {
   const schedules = Route.useLoaderData()
 
-  console.log(schedules)
-
   if ('error' in schedules) {
     return <WarningMessage error={schedules.error} />
   }
