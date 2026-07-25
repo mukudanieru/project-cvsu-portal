@@ -36,6 +36,8 @@ export const ALL_DAYS: DayOfWeek[] = [
 ]
 
 // HELPER FUNCTIONS
+
+// MOBILE
 function parseTime(timeStr: string): { hours: number; minutes: number } {
   const [hours, minutes] = timeStr.split(':').map(Number)
   return { hours, minutes }
@@ -93,4 +95,28 @@ export function groupByDay(scheduleData: ScheduleItem[]): GroupedSchedule {
   })
 
   return sortedResult
+}
+
+// DESKTOP
+export const HOUR_START = 7
+export const HOUR_END = 19
+export const HOURS = Array.from(
+  { length: HOUR_END - HOUR_START },
+  (_, i) => HOUR_START + i,
+)
+export const ROW_HEIGHT = 120 // px per hour
+
+export function parseHour(timeStr: string): number {
+  const [h, m] = timeStr.split(':').map(Number)
+  return h + m / 60
+}
+
+export function formatHourLabel(hour: number): string {
+  const h = hour % 12 === 0 ? 12 : hour % 12
+  return `${h}:00 ${hour < 12 ? 'AM' : 'PM'}`
+}
+
+export function getActiveDays(data: ScheduleItem[]) {
+  const activeDaySet = new Set(data.map((s) => s.day))
+  return ALL_DAYS.filter((d) => activeDaySet.has(d))
 }

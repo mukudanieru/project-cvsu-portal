@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Calendar } from 'lucide-react'
-import ScheduleItem from './ScheduleItem'
+import ScheduleCard from './ScheduleCard'
 
 const ScheduleMobileList = ({
   groupedScheduleData,
@@ -38,7 +38,7 @@ const ScheduleMobileList = ({
 
             <CardContent className="-mb-(--card-spacing) p-2.5 bg-accent">
               {items.map((item, idx) => (
-                <ScheduleItem key={`${item.subjectCode}-${idx}`} item={item} />
+                <ScheduleCard key={`${item.subjectCode}-${idx}`} item={item} />
               ))}
             </CardContent>
           </Card>

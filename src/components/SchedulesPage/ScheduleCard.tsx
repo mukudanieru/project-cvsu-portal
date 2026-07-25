@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Clock, BookOpen, School } from 'lucide-react'
 
-const ScheduleItem = ({
+const ScheduleCard = ({
   item,
   showTime = true,
 }: {
@@ -16,7 +16,7 @@ const ScheduleItem = ({
   return (
     <>
       <Card
-        className={`flex flex-col border ${isAsync ? 'border-border' : 'border-primary/25'} mb-2 p-0 gap-0 ${showTime ? 'min-h-28' : ''} `}
+        className={`flex flex-col border ${isAsync ? 'border-border' : 'border-primary/25'} mb-2 p-0 gap-0 ${showTime ? 'h-full' : ''}`}
       >
         <CardHeader
           className={`${isAsync ? 'bg-secondary/75' : 'bg-primary/75'} px-3.5 py-1.5`}
@@ -73,4 +73,4 @@ const ScheduleItem = ({
   )
 }
 
-export default ScheduleItem
+export default ScheduleCard

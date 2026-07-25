@@ -29,7 +29,7 @@ const SubjectsPage = ({ subjectsInfo }: SubjectsPageProps) => {
   const subjects = subjectsInfo.studentSubjects
 
   return (
-    <div className="flex w-full max-w-3xl flex-col gap-6 px-8 py-10">
+    <div className="flex w-full max-w-7xl flex-col gap-6 px-6 py-7">
       <div className="flex flex-col gap-5">
         <TitleSection title={'Enrolled Subjects'} />
 
