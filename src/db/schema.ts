@@ -8,6 +8,7 @@ import {
   date,
   time,
   boolean,
+  unique,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -152,22 +153,32 @@ export const offeringSchedules = pgTable('offering_schedules', {
   timeEnd: time('time_end').notNull(),
 })
 
-export const enrollments = pgTable('enrollments', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  studentId: uuid('student_id')
-    .references(() => students.id)
-    .notNull(),
-  subjectOfferingId: integer('subject_offering_id')
-    .references(() => subjectOfferings.id)
-    .notNull(),
-})
+export const enrollments = pgTable(
+  'enrollments',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    studentId: uuid('student_id')
+      .references(() => students.id)
+      .notNull(),
+    subjectOfferingId: integer('subject_offering_id')
+      .references(() => subjectOfferings.id)
+      .notNull(),
+  },
+  (table) => [
+    unique('enrollments_student_offering_unique').on(
+      table.studentId,
+      table.subjectOfferingId,
+    ),
+  ],
+)
 
 export const grades = pgTable('grades', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   enrollmentId: integer('enrollment_id')
     .references(() => enrollments.id)
+    .notNull()
     .unique(),
-  finalGrade: decimal('final_grade'),
+  finalGrade: decimal('final_grade', { precision: 3, scale: 2 }).notNull(),
 })
 
 // Relations
