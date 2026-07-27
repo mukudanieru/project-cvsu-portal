@@ -2,7 +2,7 @@ import type {
   GradeRow,
   GroupedGrades,
   AcademicYearGrades,
-} from './grades.interface'
+} from '@/lib/utils/grades'
 
 export function groupGradesByYearAndTerm(rows: GradeRow[]): GroupedGrades {
   const yearMap = new Map<string, AcademicYearGrades>()
