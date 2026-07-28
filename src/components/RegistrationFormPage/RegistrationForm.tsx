@@ -1,7 +1,8 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, FileDown } from 'lucide-react'
 import type { RegFormData } from '#/lib/utils/regform'
 import Page from './Page'
+import PageScaler from './PageScaler'
 import StudentInfoBlock from './StudentInfoBlock'
 import CoursesBlock from './CoursesBlock'
 import FeesBlock from './FeesBlock'
@@ -18,6 +19,7 @@ import {
   PaginationContent,
   PaginationItem,
 } from '@/components/ui/pagination'
+import { getDurationInHours } from '#/lib/utils/schedules'
 
 export interface RegistrationFormProps {
   studentRegistrationData: RegFormData
@@ -30,9 +32,26 @@ const RegistrationForm = ({
 }: RegistrationFormProps) => {
   const { studentInformation, subjects } = studentRegistrationData
 
-  // Static for now — Total Units / Total Hours are the next todo item.
-  const totalUnits = 12
-  const totalHours = 14
+  const totalUnits = useMemo(
+    () => subjects.reduce((sum, subject) => sum + subject.units, 0),
+    [subjects],
+  )
+
+  const totalHours = useMemo(
+    () =>
+      subjects.reduce((sum, subject) => {
+        const subjectHours = subject.schedules.reduce(
+          (scheduleSum, schedule) =>
+            scheduleSum +
+            getDurationInHours(schedule.timeStart, schedule.timeEnd),
+          0,
+        )
+        return sum + subjectHours
+      }, 0),
+    [subjects],
+  )
+
+  // Static for now
   const enrollmentDate = 'Thursday, 29 January 2026 | 7:49:56 am'
 
   const [layout, setLayout] = useState<PageLayout>('measuring')
@@ -63,10 +82,9 @@ const RegistrationForm = ({
   return (
     <div className="p-4">
       {/*
-        Off-screen measurement pass. Uses the same BODY_FONT_SIZE as
-        the real Page render — if these ever drift apart, measured
-        heights won't match final layout and the page-fit decision
-        below will be wrong.
+        Off-screen measurement pass. Deliberately NOT wrapped in
+        PageScaler — it must always measure at true A4 width,
+        regardless of how small the visible page is scaled down to.
       */}
       <div
         aria-hidden
@@ -92,31 +110,35 @@ const RegistrationForm = ({
       </div>
 
       {layout === 'measuring' ? (
-        <RegFormLoadingState />
+        <PageScaler>
+          <RegFormLoadingState />
+        </PageScaler>
       ) : (
         <>
-          {currentPage === 1 && (
-            <Page pageNumber={1} totalPages={totalPages}>
-              <StudentInfoBlock
-                studentInformation={studentInformation}
-                enrollmentDate={enrollmentDate}
-              />
-              <CoursesBlock subjects={subjects} />
-              {layout === 'single-page' && (
-                <FeesBlock totalUnits={totalUnits} totalHours={totalHours} />
-              )}
-            </Page>
-          )}
+          <PageScaler>
+            {currentPage === 1 && (
+              <Page pageNumber={1} totalPages={totalPages}>
+                <StudentInfoBlock
+                  studentInformation={studentInformation}
+                  enrollmentDate={enrollmentDate}
+                />
+                <CoursesBlock subjects={subjects} />
+                {layout === 'single-page' && (
+                  <FeesBlock totalUnits={totalUnits} totalHours={totalHours} />
+                )}
+              </Page>
+            )}
 
-          {currentPage === 2 && layout === 'two-page' && (
-            <Page pageNumber={2} totalPages={totalPages}>
-              <FeesBlock totalUnits={totalUnits} totalHours={totalHours} />
-            </Page>
-          )}
+            {currentPage === 2 && layout === 'two-page' && (
+              <Page pageNumber={2} totalPages={totalPages}>
+                <FeesBlock totalUnits={totalUnits} totalHours={totalHours} />
+              </Page>
+            )}
+          </PageScaler>
 
           <div
-            className="flex items-center justify-between mt-4 mx-auto"
-            style={{ width: A4_WIDTH_PX }}
+            className="flex items-center justify-between mt-4 mx-auto w-full"
+            style={{ maxWidth: A4_WIDTH_PX }}
           >
             <div>
               <Button variant="outline" className="gap-2">
@@ -126,7 +148,7 @@ const RegistrationForm = ({
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="text-sm text-foreground/65">
+              <span className="text-sm text-foreground/65 max-[321px]:hidden">
                 Page {currentPage} of {totalPages}
               </span>
 

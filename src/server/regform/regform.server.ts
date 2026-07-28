@@ -4,6 +4,7 @@ import {
   enrollments,
   subjectOfferings,
   academicPeriods,
+  offeringSchedules,
   subjects,
 } from '@/db/schema'
 import { db } from '@/db/drizzle'
@@ -26,6 +27,9 @@ export async function getRegFormInformation(
       subjectCode: subjects.subjectCode,
       subjectName: subjects.subjectName,
       units: subjects.units,
+      day: offeringSchedules.day,
+      timeStart: offeringSchedules.timeStart,
+      timeEnd: offeringSchedules.timeEnd,
     })
     .from(students)
     .innerJoin(sections, eq(students.sectionId, sections.id))
@@ -39,5 +43,9 @@ export async function getRegFormInformation(
       eq(subjectOfferings.periodId, academicPeriods.id),
     )
     .innerJoin(subjects, eq(subjectOfferings.subjectId, subjects.id))
+    .leftJoin(
+      offeringSchedules,
+      eq(subjectOfferings.id, offeringSchedules.subjectOfferingId),
+    )
     .where(and(eq(students.id, studentID), eq(academicPeriods.isCurrent, true)))
 }

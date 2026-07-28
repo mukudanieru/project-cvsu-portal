@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 export type DayOfWeek =
   | 'monday'
   | 'tuesday'
@@ -38,13 +37,19 @@ export const ALL_DAYS: DayOfWeek[] = [
 // HELPER FUNCTIONS
 
 // MOBILE
-function parseTime(timeStr: string): { hours: number; minutes: number } {
+export function parseTime(timeStr: string): { hours: number; minutes: number } {
   const [hours, minutes] = timeStr.split(':').map(Number)
   return { hours, minutes }
 }
 
-export function getDuration(timeStart: string, endStart: string): number {
-  return parseTime(timeStart).hours - parseTime(endStart).hours
+export function getDurationInHours(timeStart: string, timeEnd: string): number {
+  const start = parseTime(timeStart)
+  const end = parseTime(timeEnd)
+
+  const startTotalMinutes = start.hours * 60 + start.minutes
+  const endTotalMinutes = end.hours * 60 + end.minutes
+
+  return (endTotalMinutes - startTotalMinutes) / 60
 }
 
 export function formatTimeString(timeStr: string): string {

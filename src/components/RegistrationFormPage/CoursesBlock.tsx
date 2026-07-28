@@ -41,16 +41,24 @@ const CoursesBlock = ({ subjects }: CoursesBlockProps) => {
               {subject.units.toFixed(2)}
             </td>
             <td className="text-black border border-gray-400 p-2 text-center">
-              {/* Time */}-
-              {/* {subject.timeSlots.length
-                ? subject.timeSlots.map((t, i) => <div key={i}>{t}</div>)
-                : '-'} */}
+              {/* Time */}
+              {subject.schedules.length
+                ? subject.schedules.map((schedule, i) => (
+                    <div key={i}>
+                      {schedule.timeStart} - {schedule.timeEnd}
+                    </div>
+                  ))
+                : '-'}
             </td>
             <td className="text-black border border-gray-400 p-2 text-center">
-              {/* Day */}-
-              {/* {subject.days.length
-                ? subject.days.map((d, i) => <div key={i}>{d}</div>)
-                : '-'} */}
+              {/* Day */}
+              {subject.schedules.length
+                ? subject.schedules.map((schedule, i) => (
+                    <div className="uppercase" key={i}>
+                      {schedule.day}
+                    </div>
+                  ))
+                : '-'}
             </td>
             <td className="text-black border border-gray-400 p-2 text-center">
               {/* Room */}-
