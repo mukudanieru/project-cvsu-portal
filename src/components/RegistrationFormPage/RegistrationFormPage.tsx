@@ -1,10 +1,11 @@
 import type { RegFormData } from '#/lib/utils/regform'
 import TitleSection from '../AuthedRoute/TitleSection'
+import RegistrationForm from './RegistrationForm'
 
 const RegistrationFormPage = ({
-  studentRegistrationInformation,
+  studentRegistrationData,
 }: {
-  studentRegistrationInformation: RegFormData
+  studentRegistrationData: RegFormData
 }) => {
   return (
     <div className="flex w-full max-w-6xl flex-col gap-6 px-6 py-7">
@@ -12,7 +13,7 @@ const RegistrationFormPage = ({
         <TitleSection title={'Virtual Registration Form'} />
       </div>
 
-      <pre>{JSON.stringify(studentRegistrationInformation, null, 2)}</pre>
+      <RegistrationForm studentRegistrationData={studentRegistrationData} />
     </div>
   )
 }

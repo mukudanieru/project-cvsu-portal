@@ -12,17 +12,15 @@ export const Route = createFileRoute('/_authed/registration-form')({
 })
 
 function RouteComponent() {
-  const studentRegistrationInformation = Route.useLoaderData()
+  const studentRegistrationData = Route.useLoaderData()
 
-  if ('error' in studentRegistrationInformation) {
-    return <WarningMessage error={studentRegistrationInformation.error} />
+  if ('error' in studentRegistrationData) {
+    return <WarningMessage error={studentRegistrationData.error} />
   }
 
   return (
     <>
-      <RegistrationFormPage
-        studentRegistrationInformation={studentRegistrationInformation}
-      />
+      <RegistrationFormPage studentRegistrationData={studentRegistrationData} />
     </>
   )
 }
