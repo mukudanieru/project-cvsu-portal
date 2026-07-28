@@ -1,14 +1,23 @@
 import { useLayoutEffect, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight, FileDown } from 'lucide-react'
 import type { RegFormData } from '#/lib/utils/regform'
 import Page from './Page'
 import StudentInfoBlock from './StudentInfoBlock'
 import CoursesBlock from './CoursesBlock'
 import FeesBlock from './FeesBlock'
+import RegFormLoadingState from './RegFormLoadingState'
 import {
   PAGE_CONTENT_HEIGHT_PX,
   PAGE_CONTENT_WIDTH_PX,
+  A4_WIDTH_PX,
   BODY_FONT_SIZE,
 } from './layout-constants'
+import { Button } from '@/components/ui/button'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from '@/components/ui/pagination'
 
 export interface RegistrationFormProps {
   studentRegistrationData: RegFormData
@@ -27,6 +36,7 @@ const RegistrationForm = ({
   const enrollmentDate = 'Thursday, 29 January 2026 | 7:49:56 am'
 
   const [layout, setLayout] = useState<PageLayout>('measuring')
+  const [currentPage, setCurrentPage] = useState(1)
 
   const infoAndCoursesRef = useRef<HTMLDivElement>(null)
   const feesRef = useRef<HTMLDivElement>(null)
@@ -37,12 +47,21 @@ const RegistrationForm = ({
 
     const remainingSpace = PAGE_CONTENT_HEIGHT_PX - infoAndCoursesHeight
     setLayout(remainingSpace >= feesHeight ? 'single-page' : 'two-page')
+    setCurrentPage(1) // reset to page 1 whenever the underlying data changes
   }, [studentInformation, subjects])
+
+  const totalPages = layout === 'two-page' ? 2 : 1
+
+  const goToPreviousPage = () => {
+    setCurrentPage((page) => Math.max(1, page - 1))
+  }
+
+  const goToNextPage = () => {
+    setCurrentPage((page) => Math.min(totalPages, page + 1))
+  }
 
   return (
     <div className="p-4">
-      <div>{/* BUTTON HERE — PDF export, next todo item */}</div>
-
       {/*
         Off-screen measurement pass. Uses the same BODY_FONT_SIZE as
         the real Page render — if these ever drift apart, measured
@@ -72,28 +91,72 @@ const RegistrationForm = ({
         </div>
       </div>
 
-      {layout === 'measuring' ? null : layout === 'single-page' ? (
-        <Page pageNumber={1} totalPages={1}>
-          <StudentInfoBlock
-            studentInformation={studentInformation}
-            enrollmentDate={enrollmentDate}
-          />
-          <CoursesBlock subjects={subjects} />
-          <FeesBlock totalUnits={totalUnits} totalHours={totalHours} />
-        </Page>
+      {layout === 'measuring' ? (
+        <RegFormLoadingState />
       ) : (
-        <div className="flex flex-col gap-4">
-          <Page pageNumber={1} totalPages={2}>
-            <StudentInfoBlock
-              studentInformation={studentInformation}
-              enrollmentDate={enrollmentDate}
-            />
-            <CoursesBlock subjects={subjects} />
-          </Page>
-          <Page pageNumber={2} totalPages={2}>
-            <FeesBlock totalUnits={totalUnits} totalHours={totalHours} />
-          </Page>
-        </div>
+        <>
+          {currentPage === 1 && (
+            <Page pageNumber={1} totalPages={totalPages}>
+              <StudentInfoBlock
+                studentInformation={studentInformation}
+                enrollmentDate={enrollmentDate}
+              />
+              <CoursesBlock subjects={subjects} />
+              {layout === 'single-page' && (
+                <FeesBlock totalUnits={totalUnits} totalHours={totalHours} />
+              )}
+            </Page>
+          )}
+
+          {currentPage === 2 && layout === 'two-page' && (
+            <Page pageNumber={2} totalPages={totalPages}>
+              <FeesBlock totalUnits={totalUnits} totalHours={totalHours} />
+            </Page>
+          )}
+
+          <div
+            className="flex items-center justify-between mt-4 mx-auto"
+            style={{ width: A4_WIDTH_PX }}
+          >
+            <div>
+              <Button variant="outline" className="gap-2">
+                <FileDown className="h-4 w-4" />
+                Download
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-foreground/65">
+                Page {currentPage} of {totalPages}
+              </span>
+
+              <Pagination className="mx-0 w-auto">
+                <PaginationContent>
+                  <PaginationItem>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled={currentPage <= 1}
+                      onClick={goToPreviousPage}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled={currentPage >= totalPages}
+                      onClick={goToNextPage}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
