@@ -68,16 +68,24 @@ export function AppSidebar({ user, error, handleLogout }: NavUserProps) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:p-2! h-auto"
             >
-              <Link to="/account">
-                <div className="w-6 h-6 md:w-7 md:h-8 drop-shadow-lg">
+              <Link to="/account" className="flex items-center gap-2.5">
+                <div className="w-10 h-10">
                   <img
-                    src="./logo.png"
+                    src="/logo.png"
+                    alt="CvSU seal"
                     className="w-full h-full object-contain"
                   />
                 </div>
-                <span className="text-base font-semibold">CvSU Portal</span>
+                <div className="flex flex-col items-start min-w-0">
+                  <span className="text-primary text-base font-semibold leading-tight">
+                    Cavite State University
+                  </span>
+                  <span className="text-amber-600/90 text-xs leading-tight">
+                    Truth • Excellence • Service
+                  </span>
+                </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

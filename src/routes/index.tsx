@@ -22,7 +22,7 @@ function App() {
   }
 
   return (
-    <main className="relative flex-1 overflow-hidden flex items-center justify-center p-6 md:p-10">
+    <main className="relative flex-1 overflow-hidden flex justify-center p-6 md:p-10">
       <LoginPage onSuccess={handleLoginSucess} />
     </main>
   )
