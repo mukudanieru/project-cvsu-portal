@@ -7,6 +7,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
 
 import appCss from '../styles.css?url'
 
@@ -48,6 +49,7 @@ function RootDocument() {
         <ThemeProvider defaultTheme="system" storageKey="theme">
           <Outlet />
         </ThemeProvider>
+        <Toaster />
         <TanStackDevtools
           config={{
             position: 'bottom-right',
