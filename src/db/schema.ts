@@ -9,6 +9,7 @@ import {
   time,
   boolean,
   unique,
+  index,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -46,14 +47,18 @@ export const departments = pgTable('departments', {
   name: varchar('name', { length: 100 }).notNull().unique(),
 })
 
-export const courses = pgTable('courses', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  courseCode: varchar('course_code', { length: 50 }).notNull().unique(),
-  courseName: varchar('course_name', { length: 255 }).notNull(),
-  departmentId: integer('department_id')
-    .notNull()
-    .references(() => departments.id),
-})
+export const courses = pgTable(
+  'courses',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    courseCode: varchar('course_code', { length: 50 }).notNull().unique(),
+    courseName: varchar('course_name', { length: 255 }).notNull(),
+    departmentId: integer('department_id')
+      .notNull()
+      .references(() => departments.id),
+  },
+  (table) => [index('department_idx').on(table.departmentId)],
+)
 
 export const accounts = pgTable('accounts', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -106,16 +111,19 @@ export const academicPeriods = pgTable('academic_periods', {
   isCurrent: boolean('is_current').notNull().default(false),
 })
 
-export const sections = pgTable('sections', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  programCode: varchar('program_code', { length: 24 }).notNull(),
-  yearLevel: integer('year_level').notNull(),
-  sectionNumber: integer('section_number').notNull(),
-  facultyId: integer('faculty_id')
-    .references(() => faculty.id)
-    .notNull()
-    .unique(),
-})
+export const sections = pgTable(
+  'sections',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    programCode: varchar('program_code', { length: 24 }).notNull(),
+    yearLevel: integer('year_level').notNull(),
+    sectionNumber: integer('section_number').notNull(),
+    facultyId: integer('faculty_id')
+      .references(() => faculty.id)
+      .notNull(),
+  },
+  (table) => [index('sections_faculty_id_idx').on(table.facultyId)],
+)
 
 export const subjects = pgTable('subjects', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
