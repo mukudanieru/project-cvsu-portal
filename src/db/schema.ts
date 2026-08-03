@@ -72,28 +72,35 @@ export const accounts = pgTable('accounts', {
   passwordHash: varchar('password_hash', { length: 255 }).notNull(),
 })
 
-export const students = pgTable('students', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  studentNumber: varchar('student_number', { length: 50 }).notNull().unique(),
-  firstName: varchar('first_name', { length: 100 }).notNull(),
-  lastName: varchar('last_name', { length: 100 }).notNull(),
-  middleName: varchar('middle_name', { length: 100 }),
-  courseId: integer('course_id')
-    .references(() => courses.id)
-    .notNull(),
-  sectionId: integer('section_id')
-    .references(() => sections.id)
-    .notNull(),
-  studentStatus: studentStatusEnum('student_status')
-    .default('regular')
-    .notNull(),
-  sex: sexEnum('sex').notNull(),
-  address: varchar('address', { length: 255 }).notNull(),
-  relationshipStatus: varchar('relationship_status').default('single'),
-  birthday: date('birthday').notNull(),
-  citizenship: varchar('citizenship', { length: 100 }).notNull(),
-  guardian: varchar('guardian', { length: 255 }),
-})
+export const students = pgTable(
+  'students',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    studentNumber: varchar('student_number', { length: 50 }).notNull().unique(),
+    firstName: varchar('first_name', { length: 100 }).notNull(),
+    lastName: varchar('last_name', { length: 100 }).notNull(),
+    middleName: varchar('middle_name', { length: 100 }),
+    courseId: integer('course_id')
+      .references(() => courses.id)
+      .notNull(),
+    sectionId: integer('section_id')
+      .references(() => sections.id)
+      .notNull(),
+    studentStatus: studentStatusEnum('student_status')
+      .default('regular')
+      .notNull(),
+    sex: sexEnum('sex').notNull(),
+    address: varchar('address', { length: 255 }).notNull(),
+    relationshipStatus: varchar('relationship_status').default('single'),
+    birthday: date('birthday').notNull(),
+    citizenship: varchar('citizenship', { length: 100 }).notNull(),
+    guardian: varchar('guardian', { length: 255 }),
+  },
+  (table) => [
+    index('students_course_id_idx').on(table.courseId),
+    index('students_section_id_idx').on(table.sectionId),
+  ],
+)
 
 export const faculty = pgTable('faculty', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
@@ -103,13 +110,23 @@ export const faculty = pgTable('faculty', {
   email: varchar('faculty_email', { length: 255 }).notNull().unique(),
 })
 
-export const academicPeriods = pgTable('academic_periods', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  startYear: integer('start_year').notNull(),
-  endYear: integer('end_year').notNull(),
-  term: academicTermEnum('term').notNull(),
-  isCurrent: boolean('is_current').notNull().default(false),
-})
+export const academicPeriods = pgTable(
+  'academic_periods',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    startYear: integer('start_year').notNull(),
+    endYear: integer('end_year').notNull(),
+    term: academicTermEnum('term').notNull(),
+    isCurrent: boolean('is_current').notNull().default(false),
+  },
+  (table) => [
+    unique('academic_periods_year_term_unique').on(
+      table.startYear,
+      table.endYear,
+      table.term,
+    ),
+  ],
+)
 
 export const sections = pgTable(
   'sections',
@@ -132,34 +149,58 @@ export const subjects = pgTable('subjects', {
   units: integer('units').notNull(),
 })
 
-export const subjectOfferings = pgTable('subject_offerings', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  subjectId: integer('subject_id')
-    .references(() => subjects.id)
-    .notNull(),
-  sectionId: integer('section_id')
-    .references(() => sections.id)
-    .notNull(),
-  periodId: integer('period_id')
-    .references(() => academicPeriods.id)
-    .notNull(),
-  facultyId: integer('faculty_id')
-    .references(() => faculty.id)
-    .notNull(),
-  scheduleCode: varchar('schedule_code', { length: 50 }).notNull().unique(),
-  slots: integer('slots'),
-})
+export const subjectOfferings = pgTable(
+  'subject_offerings',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    subjectId: integer('subject_id')
+      .references(() => subjects.id)
+      .notNull(),
+    sectionId: integer('section_id')
+      .references(() => sections.id)
+      .notNull(),
+    periodId: integer('period_id')
+      .references(() => academicPeriods.id)
+      .notNull(),
+    facultyId: integer('faculty_id')
+      .references(() => faculty.id)
+      .notNull(),
+    scheduleCode: varchar('schedule_code', { length: 50 }).notNull().unique(),
+    slots: integer('slots').default(100),
+  },
+  (table) => [
+    index('subject_offerings_subject_id_idx').on(table.subjectId),
+    index('subject_offerings_faculty_id_idx').on(table.facultyId),
+    index('subject_offerings_section_period_idx').on(
+      table.sectionId,
+      table.periodId,
+    ),
+    unique('subject_offerings_subject_section_period_unique').on(
+      table.subjectId,
+      table.sectionId,
+      table.periodId,
+    ),
+  ],
+)
 
-export const offeringSchedules = pgTable('offering_schedules', {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  subjectOfferingId: integer('subject_offering_id')
-    .references(() => subjectOfferings.id)
-    .notNull(),
-  classMode: classModeEnum('class_mode').default('synchronous').notNull(),
-  day: dayEnum('day').notNull(),
-  timeStart: time('time_start').notNull(),
-  timeEnd: time('time_end').notNull(),
-})
+export const offeringSchedules = pgTable(
+  'offering_schedules',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    subjectOfferingId: integer('subject_offering_id')
+      .references(() => subjectOfferings.id)
+      .notNull(),
+    classMode: classModeEnum('class_mode').default('synchronous').notNull(),
+    day: dayEnum('day').notNull(),
+    timeStart: time('time_start').notNull(),
+    timeEnd: time('time_end').notNull(),
+  },
+  (table) => [
+    index('offering_schedules_subject_offering_id_idx').on(
+      table.subjectOfferingId,
+    ),
+  ],
+)
 
 export const enrollments = pgTable(
   'enrollments',

@@ -66,8 +66,8 @@ export function buildRegForm(rows: RegFormRow[]): RegFormData {
     if (row.day !== null && row.timeStart !== null && row.timeEnd !== null) {
       subject.schedules.push({
         day: row.day,
-        timeStart: row.timeStart,
-        timeEnd: row.timeEnd,
+        timeStart: row.timeStart.slice(0, 5),
+        timeEnd: row.timeEnd.slice(0, 5),
       })
     }
   }

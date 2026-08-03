@@ -17,6 +17,7 @@ import { ModeToggle } from '.././mode-toggle'
 import { Spinner } from '@/components/ui/spinner'
 import AlertDestructive from '@/components/ErrorComponents/ErrorMessage'
 import type { AlertDestructiveProps } from '@/components/ErrorComponents/ErrorMessage'
+import ProjectDisclaimerDialog from './ProjectDisclaimerDialog'
 
 import { useState } from 'react'
 import { loginFn } from '#/server/auth/auth.functions'
@@ -63,7 +64,8 @@ const LoginPage = ({ onSuccess }: Props) => {
       <div className="absolute inset-0 bg-[url(/background.jpg)] bg-cover bg-center blur-[3px]" />
       <div className="absolute inset-0 bg-background/2 dark:bg-background/20" />
 
-      <div className="absolute top-4 right-4 z-10">
+      <div className="absolute top-4 right-4 z-10 flex gap-2 justify-center items-center">
+        <ProjectDisclaimerDialog />
         <ModeToggle />
       </div>
 
