@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { CircleQuestionMark, Check } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 const features = [
   'Create your own personal account, no real student data required',
@@ -17,9 +18,22 @@ const features = [
   'Export your registration form as a PDF, styled after the original',
 ]
 
+const DISCLAIMER_STORAGE_KEY = 'myindex:has-seen-disclaimer'
+
 const ProjectDisclaimerDialog = () => {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const hasSeenDisclaimer = localStorage.getItem(DISCLAIMER_STORAGE_KEY)
+
+    if (!hasSeenDisclaimer) {
+      setOpen(true)
+      localStorage.setItem(DISCLAIMER_STORAGE_KEY, 'true')
+    }
+  }, [])
+
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger
         className="flex max-h-[80vh] flex-col gap-0 p-0"
         asChild
