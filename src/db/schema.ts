@@ -11,7 +11,6 @@ import {
   unique,
   index,
 } from 'drizzle-orm/pg-core'
-import { relations } from 'drizzle-orm'
 
 // Enums
 export const studentStatusEnum = pgEnum('student_status', [
@@ -20,6 +19,12 @@ export const studentStatusEnum = pgEnum('student_status', [
 ])
 
 export const sexEnum = pgEnum('sex', ['male', 'female'])
+
+export const relationshipStatusEnum = pgEnum('relationship_status', [
+  'single',
+  'in_relationship',
+  'married',
+])
 
 export const academicTermEnum = pgEnum('academic_term', [
   'first',
@@ -91,7 +96,9 @@ export const students = pgTable(
       .notNull(),
     sex: sexEnum('sex').notNull(),
     address: varchar('address', { length: 255 }).notNull(),
-    relationshipStatus: varchar('relationship_status').default('single'),
+    relationshipStatus: relationshipStatusEnum('relationship_status').default(
+      'single',
+    ),
     birthday: date('birthday').notNull(),
     citizenship: varchar('citizenship', { length: 100 }).notNull(),
     guardian: varchar('guardian', { length: 255 }),
@@ -132,14 +139,24 @@ export const sections = pgTable(
   'sections',
   {
     id: integer().primaryKey().generatedByDefaultAsIdentity(),
-    programCode: varchar('program_code', { length: 24 }).notNull(),
+    courseId: integer('course_id')
+      .references(() => courses.id)
+      .notNull(),
     yearLevel: integer('year_level').notNull(),
     sectionNumber: integer('section_number').notNull(),
     facultyId: integer('faculty_id')
       .references(() => faculty.id)
       .notNull(),
   },
-  (table) => [index('sections_faculty_id_idx').on(table.facultyId)],
+  (table) => [
+    index('sections_faculty_id_idx').on(table.facultyId),
+    index('sections_course_id_idx').on(table.courseId),
+    unique('sections_course_year_section_unique').on(
+      table.courseId,
+      table.yearLevel,
+      table.sectionNumber,
+    ),
+  ],
 )
 
 export const subjects = pgTable('subjects', {
@@ -229,26 +246,3 @@ export const grades = pgTable('grades', {
     .unique(),
   finalGrade: decimal('final_grade', { precision: 3, scale: 2 }).notNull(),
 })
-
-// Relations
-export const coursesRelations = relations(courses, ({ many }) => ({
-  students: many(students),
-}))
-
-export const studentsRelations = relations(students, ({ one }) => ({
-  course: one(courses, {
-    fields: [students.courseId],
-    references: [courses.id],
-  }),
-  account: one(accounts, {
-    fields: [students.id],
-    references: [accounts.studentId],
-  }),
-}))
-
-export const accountsRelations = relations(accounts, ({ one }) => ({
-  student: one(students, {
-    fields: [accounts.studentId],
-    references: [students.id],
-  }),
-}))

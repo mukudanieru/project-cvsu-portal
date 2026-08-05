@@ -1,5 +1,5 @@
 {
-  "id": "7946d9a1-b654-4a06-af33-d28108130494",
+  "id": "427ece25-8819-4dae-9d3d-36176ce4a9ac",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -55,7 +55,17 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "academic_periods_year_term_unique": {
+          "name": "academic_periods_year_term_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "start_year",
+            "end_year",
+            "term"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -523,7 +533,23 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "offering_schedules_subject_offering_id_idx": {
+          "name": "offering_schedules_subject_offering_id_idx",
+          "columns": [
+            {
+              "expression": "subject_offering_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "offering_schedules_subject_offering_id_subject_offerings_id_fk": {
           "name": "offering_schedules_subject_offering_id_subject_offerings_id_fk",
@@ -566,9 +592,9 @@
             "cycle": false
           }
         },
-        "program_code": {
-          "name": "program_code",
-          "type": "varchar(24)",
+        "course_id": {
+          "name": "course_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -606,9 +632,37 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "sections_course_id_idx": {
+          "name": "sections_course_id_idx",
+          "columns": [
+            {
+              "expression": "course_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
+        "sections_course_id_courses_id_fk": {
+          "name": "sections_course_id_courses_id_fk",
+          "tableFrom": "sections",
+          "tableTo": "courses",
+          "columnsFrom": [
+            "course_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "sections_faculty_id_faculty_id_fk": {
           "name": "sections_faculty_id_faculty_id_fk",
           "tableFrom": "sections",
@@ -624,7 +678,17 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "sections_course_year_section_unique": {
+          "name": "sections_course_year_section_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "course_id",
+            "year_level",
+            "section_number"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -699,7 +763,8 @@
         },
         "relationship_status": {
           "name": "relationship_status",
-          "type": "varchar",
+          "type": "relationship_status",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
           "default": "'single'"
@@ -723,7 +788,38 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "students_course_id_idx": {
+          "name": "students_course_id_idx",
+          "columns": [
+            {
+              "expression": "course_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "students_section_id_idx": {
+          "name": "students_section_id_idx",
+          "columns": [
+            {
+              "expression": "section_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "students_course_id_courses_id_fk": {
           "name": "students_course_id_courses_id_fk",
@@ -821,10 +917,63 @@
           "name": "slots",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": 100
         }
       },
-      "indexes": {},
+      "indexes": {
+        "subject_offerings_subject_id_idx": {
+          "name": "subject_offerings_subject_id_idx",
+          "columns": [
+            {
+              "expression": "subject_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "subject_offerings_faculty_id_idx": {
+          "name": "subject_offerings_faculty_id_idx",
+          "columns": [
+            {
+              "expression": "faculty_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "subject_offerings_section_period_idx": {
+          "name": "subject_offerings_section_period_idx",
+          "columns": [
+            {
+              "expression": "section_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "period_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "subject_offerings_subject_id_subjects_id_fk": {
           "name": "subject_offerings_subject_id_subjects_id_fk",
@@ -886,6 +1035,15 @@
           "nullsNotDistinct": false,
           "columns": [
             "schedule_code"
+          ]
+        },
+        "subject_offerings_subject_section_period_unique": {
+          "name": "subject_offerings_subject_section_period_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "subject_id",
+            "section_id",
+            "period_id"
           ]
         }
       },
@@ -978,6 +1136,15 @@
         "thursday",
         "friday",
         "saturday"
+      ]
+    },
+    "public.relationship_status": {
+      "name": "relationship_status",
+      "schema": "public",
+      "values": [
+        "single",
+        "in_relationship",
+        "married"
       ]
     },
     "public.sex": {

@@ -1,1 +1,0 @@
-ALTER TABLE "subject_offerings" ALTER COLUMN "slots" SET DEFAULT 100;
