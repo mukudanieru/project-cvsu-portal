@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm'
 import {
   uuid,
   integer,
@@ -13,11 +14,6 @@ import {
 } from 'drizzle-orm/pg-core'
 
 // Enums
-export const studentStatusEnum = pgEnum('student_status', [
-  'regular',
-  'irregular',
-])
-
 export const sexEnum = pgEnum('sex', ['male', 'female'])
 
 export const relationshipStatusEnum = pgEnum('relationship_status', [
@@ -91,9 +87,7 @@ export const students = pgTable(
     sectionId: integer('section_id')
       .references(() => sections.id)
       .notNull(),
-    studentStatus: studentStatusEnum('student_status')
-      .default('regular')
-      .notNull(),
+    isEnrolled: boolean('is_enrolled').notNull().default(false),
     sex: sexEnum('sex').notNull(),
     address: varchar('address', { length: 255 }).notNull(),
     relationshipStatus: relationshipStatusEnum('relationship_status').default(
@@ -246,3 +240,22 @@ export const grades = pgTable('grades', {
     .unique(),
   finalGrade: decimal('final_grade', { precision: 3, scale: 2 }).notNull(),
 })
+
+// Relations
+export const studentsRelations = relations(students, ({ one }) => ({
+  course: one(courses, {
+    fields: [students.courseId],
+    references: [courses.id],
+  }),
+  account: one(accounts, {
+    fields: [students.id],
+    references: [accounts.studentId],
+  }),
+}))
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  student: one(students, {
+    fields: [accounts.studentId],
+    references: [students.id],
+  }),
+}))

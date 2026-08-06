@@ -1,6 +1,6 @@
 {
-  "id": "1b6e1d42-4acd-436b-acc1-7dde8ebd6099",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "4fb5c41f-067d-4812-a662-0e53fdc6670a",
+  "prevId": "1b6e1d42-4acd-436b-acc1-7dde8ebd6099",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -740,8 +740,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "isEnrolled": {
-          "name": "isEnrolled",
+        "is_enrolled": {
+          "name": "is_enrolled",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
