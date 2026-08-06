@@ -18,6 +18,8 @@ export const loginFn = createServerFn({ method: 'POST' })
   .handler(async ({ data }) => {
     const studentAccount = await findStudentByStudentNumber(data.studentNumber)
 
+    console.log(studentAccount)
+
     if (!studentAccount) {
       return {
         error: {

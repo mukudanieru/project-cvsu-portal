@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedSubjectsRouteImport } from './routes/_authed/subjects'
@@ -17,6 +18,11 @@ import { Route as AuthedRegistrationFormRouteImport } from './routes/_authed/reg
 import { Route as AuthedGradesRouteImport } from './routes/_authed/grades'
 import { Route as AuthedAccountRouteImport } from './routes/_authed/account'
 
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedRoute = AuthedRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
@@ -54,6 +60,7 @@ const AuthedAccountRoute = AuthedAccountRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/register': typeof RegisterRoute
   '/account': typeof AuthedAccountRoute
   '/grades': typeof AuthedGradesRoute
   '/registration-form': typeof AuthedRegistrationFormRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/register': typeof RegisterRoute
   '/account': typeof AuthedAccountRoute
   '/grades': typeof AuthedGradesRoute
   '/registration-form': typeof AuthedRegistrationFormRoute
@@ -72,6 +80,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
+  '/register': typeof RegisterRoute
   '/_authed/account': typeof AuthedAccountRoute
   '/_authed/grades': typeof AuthedGradesRoute
   '/_authed/registration-form': typeof AuthedRegistrationFormRoute
@@ -82,6 +91,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/register'
     | '/account'
     | '/grades'
     | '/registration-form'
@@ -90,6 +100,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/register'
     | '/account'
     | '/grades'
     | '/registration-form'
@@ -99,6 +110,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authed'
+    | '/register'
     | '/_authed/account'
     | '/_authed/grades'
     | '/_authed/registration-form'
@@ -109,10 +121,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed': {
       id: '/_authed'
       path: ''
@@ -187,6 +207,7 @@ const AuthedRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

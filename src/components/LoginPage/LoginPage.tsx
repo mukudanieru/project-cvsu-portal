@@ -21,6 +21,8 @@ import ProjectDisclaimerDialog from './ProjectDisclaimerDialog'
 
 import { useState } from 'react'
 import { loginFn } from '#/server/auth/auth.functions'
+import { Link } from '@tanstack/react-router'
+import PasswordInput from '../password-input'
 
 type Props = {
   onSuccess?: () => void | Promise<void>
@@ -128,14 +130,14 @@ const LoginPage = ({ onSuccess }: Props) => {
                     }}
                   />
                 </Field>
+
                 <Field data-invalid={passwordError}>
                   <div className="flex items-center">
                     <FieldLabel htmlFor="password">Password</FieldLabel>
                   </div>
-                  <Input
+                  <PasswordInput
                     aria-invalid={passwordError}
                     id="password"
-                    type="password"
                     required
                     onChange={(e) => {
                       setPassword(e.target.value)
@@ -143,18 +145,19 @@ const LoginPage = ({ onSuccess }: Props) => {
                     }}
                   />
                 </Field>
+
                 <Field>
                   <Button type="submit" disabled={loading}>
                     {loading ? <Spinner data-icon="inline-start" /> : 'Login'}
                   </Button>
                   <FieldDescription className="text-center">
-                    Having issues with your account?{' '}
-                    <a
+                    Want to register your own?{' '}
+                    <Link
+                      to="/register"
                       className="hover:text-foreground! transition-colors"
-                      href="#"
                     >
-                      Get assistance
-                    </a>
+                      Register
+                    </Link>
                   </FieldDescription>
                 </Field>
               </FieldGroup>
