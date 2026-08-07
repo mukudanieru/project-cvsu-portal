@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
 import TitleSection from '../AuthedRoute/TitleSection'
 import { Button } from '@/components/ui/button'
@@ -20,12 +21,71 @@ import type {
   RegisterFormValues,
 } from '#/lib/schema/register.schema'
 
-const IdentityInfoForm = ({ onNext }: { onNext: () => void }) => {
+// server fn
+import { getSectionsByCourseId } from '#/server/register/register.functions'
+
+type Course = { id: number; courseName: string }
+type Section = {
+  sectionId: number
+  courseCode: string
+  yearLevel: number
+  sectionNumber: number
+}
+
+const IdentityInfoForm = ({
+  onNext,
+  courses,
+  coursesUnavailable,
+}: {
+  onNext: () => void
+  courses: Course[]
+  coursesUnavailable: boolean
+}) => {
   const {
     register,
     control,
+    watch,
+    resetField,
     formState: { errors },
   } = useFormContext<RegisterFormInput, unknown, RegisterFormValues>()
+
+  const courseId = watch('courseId')
+
+  const [sections, setSections] = useState<Section[]>([])
+  const [sectionsLoading, setSectionsLoading] = useState(false)
+  const [sectionsUnavailable, setSectionsUnavailable] = useState(false)
+
+  const noSectionsForCourse =
+    !!courseId &&
+    !sectionsLoading &&
+    !sectionsUnavailable &&
+    sections.length === 0
+
+  useEffect(() => {
+    if (!courseId) {
+      setSections([])
+      return
+    }
+
+    resetField('sectionId')
+    setSectionsLoading(true)
+    setSectionsUnavailable(false)
+
+    getSectionsByCourseId({ data: { courseId: Number(courseId) } })
+      .then((result) => {
+        if ('error' in result) {
+          setSectionsUnavailable(true)
+          setSections([])
+        } else {
+          setSections(result)
+        }
+      })
+      .catch(() => {
+        setSectionsUnavailable(true)
+        setSections([])
+      })
+      .finally(() => setSectionsLoading(false))
+  }, [courseId])
 
   return (
     <div className="relative z-10 flex w-full max-w-4xl min-h-dvh flex-col justify-center border-0 bg-card p-6 lg:min-h-fit lg:rounded-xl lg:border lg:p-10 lg:shadow-lg">
@@ -38,13 +98,7 @@ const IdentityInfoForm = ({ onNext }: { onNext: () => void }) => {
           </p>
         </div>
 
-        <form
-          className="flex w-full flex-col gap-8 lg:w-2/3"
-          // onSubmit={(e) => {
-          //   e.preventDefault()
-          //   onNext()
-          // }}
-        >
+        <form className="flex w-full flex-col gap-8 lg:w-2/3">
           <FieldGroup className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <Field data-invalid={errors.firstName ? true : false}>
               <FieldLabel htmlFor="first-name">
@@ -119,6 +173,7 @@ const IdentityInfoForm = ({ onNext }: { onNext: () => void }) => {
                 name="courseId"
                 render={({ field }) => (
                   <Select
+                    disabled={coursesUnavailable}
                     onValueChange={(value) => field.onChange(Number(value))}
                     value={field.value ? String(field.value) : undefined}
                   >
@@ -126,22 +181,34 @@ const IdentityInfoForm = ({ onNext }: { onNext: () => void }) => {
                       id="course"
                       aria-invalid={errors.courseId ? true : false}
                     >
-                      <SelectValue placeholder="Select a course" />
+                      <SelectValue
+                        placeholder={
+                          coursesUnavailable
+                            ? 'No courses available'
+                            : 'Select a course'
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      {/* placeholder — swap for real seeded courses via a loader */}
-                      <SelectItem value="1">BS Computer Science</SelectItem>
-                      <SelectItem value="2">
-                        BS Information Technology
-                      </SelectItem>
+                      {courses.map((course) => (
+                        <SelectItem key={course.id} value={String(course.id)}>
+                          {course.courseName}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}
               />
-              {errors.courseId && (
+              {coursesUnavailable ? (
                 <FieldDescription className="text-destructive">
-                  {errors.courseId.message}
+                  Courses couldn't be loaded. Try refreshing the page.
                 </FieldDescription>
+              ) : (
+                errors.courseId && (
+                  <FieldDescription className="text-destructive">
+                    {errors.courseId.message}
+                  </FieldDescription>
+                )
               )}
             </Field>
 
@@ -154,6 +221,12 @@ const IdentityInfoForm = ({ onNext }: { onNext: () => void }) => {
                 name="sectionId"
                 render={({ field }) => (
                   <Select
+                    disabled={
+                      !courseId ||
+                      sectionsLoading ||
+                      sectionsUnavailable ||
+                      noSectionsForCourse
+                    }
                     onValueChange={(value) => field.onChange(Number(value))}
                     value={field.value ? String(field.value) : undefined}
                   >
@@ -161,12 +234,29 @@ const IdentityInfoForm = ({ onNext }: { onNext: () => void }) => {
                       id="section"
                       aria-invalid={errors.sectionId ? true : false}
                     >
-                      <SelectValue placeholder="Select a section" />
+                      <SelectValue
+                        placeholder={
+                          !courseId
+                            ? 'Select a course first'
+                            : sectionsLoading
+                              ? 'Loading sections…'
+                              : sectionsUnavailable
+                                ? 'No sections available'
+                                : noSectionsForCourse
+                                  ? 'No sections for this course'
+                                  : 'Select a section'
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      {/* placeholder — should filter by selected courseId */}
-                      <SelectItem value="1">BSCS 1</SelectItem>
-                      <SelectItem value="2">BSCS 2</SelectItem>
+                      {sections.map((section) => (
+                        <SelectItem
+                          key={section.sectionId}
+                          value={String(section.sectionId)}
+                        >
+                          {`${section.courseCode} ${section.yearLevel}-${section.sectionNumber}`}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 )}
@@ -180,7 +270,12 @@ const IdentityInfoForm = ({ onNext }: { onNext: () => void }) => {
           </FieldGroup>
 
           <div className="mt-4 flex justify-end">
-            <Button size={'lg'} type="button" onClick={onNext}>
+            <Button
+              size={'lg'}
+              type="button"
+              onClick={onNext}
+              disabled={coursesUnavailable}
+            >
               Next
             </Button>
           </div>

@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useEffect, useState } from 'react'
@@ -21,12 +21,22 @@ import type {
   RegisterStep,
 } from '#/lib/schema/register.schema'
 
+// server fn
+import { getCourses } from '#/server/register/register.functions'
+
 const DRAFT_KEY = 'register-draft'
 
 export const Route = createFileRoute('/register')({
   validateSearch: z.object({
     step: z.enum(registerSteps).default('identity'),
   }),
+  loader: async () => {
+    const result = await getCourses()
+    return {
+      courses: 'error' in result ? [] : result,
+      coursesUnavailable: 'error' in result,
+    }
+  },
   component: RouteComponent,
 })
 
@@ -41,6 +51,7 @@ function loadDraft(): Partial<RegisterFormInput> {
 
 function RouteComponent() {
   const { step } = Route.useSearch()
+  const { courses, coursesUnavailable } = Route.useLoaderData()
   const navigate = Route.useNavigate()
   const stepIndex = registerSteps.indexOf(step)
 
@@ -100,7 +111,7 @@ function RouteComponent() {
     console.log('submitting', values)
 
     localStorage.removeItem(DRAFT_KEY)
-    redirect({ to: '/' })
+    navigate({ to: '/' })
   }
 
   return (
@@ -117,7 +128,13 @@ function RouteComponent() {
         <RegisterSkeleton />
       ) : (
         <FormProvider {...form}>
-          {step === 'identity' && <IdentityInfoForm onNext={handleNext} />}
+          {step === 'identity' && (
+            <IdentityInfoForm
+              onNext={handleNext}
+              courses={courses}
+              coursesUnavailable={coursesUnavailable}
+            />
+          )}
           {step === 'personal' && (
             <PersonalInfoForm onNext={handleNext} onBack={handleBack} />
           )}

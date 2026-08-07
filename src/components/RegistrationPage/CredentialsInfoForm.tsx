@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import TitleSection from '../AuthedRoute/TitleSection'
 import { Button } from '@/components/ui/button'
@@ -7,7 +8,6 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
 import {
   InputGroup,
   InputGroupAddon,
@@ -20,6 +20,9 @@ import type {
 } from '#/lib/schema/register.schema'
 import PasswordInput from '../password-input'
 
+// server fn
+import { generateStudentNumber } from '#/server/register/register.functions'
+
 const CredentialsInfoForm = ({
   onSubmit,
   onBack,
@@ -31,17 +34,23 @@ const CredentialsInfoForm = ({
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useFormContext<RegisterFormInput, unknown, RegisterFormValues>()
 
-  // TODO: replace with a server function returning a real candidate
-  // student number (count-based per year, per the earlier plan)
-  function handleGenerateStudentNumber() {
-    const prefix = '202'
-    const randomSuffix = Math.floor(100000 + Math.random() * 900000)
-    setValue('studentNumber', `${prefix}${randomSuffix}`, {
-      shouldValidate: true,
-    })
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  async function handleGenerateStudentNumber() {
+    setIsGenerating(true)
+    const result = await generateStudentNumber()
+    setIsGenerating(false)
+
+    if ('error' in result) {
+      setError('studentNumber', { message: result.error?.description })
+      return
+    }
+
+    setValue('studentNumber', result.studentNumber, { shouldValidate: true })
   }
 
   return (
@@ -79,8 +88,9 @@ const CredentialsInfoForm = ({
                         type="button"
                         variant="secondary"
                         onClick={handleGenerateStudentNumber}
+                        disabled={isGenerating}
                       >
-                        Generate
+                        {isGenerating ? 'Generating…' : 'Generate'}
                       </InputGroupButton>
                     </InputGroupAddon>
                   </InputGroup>
