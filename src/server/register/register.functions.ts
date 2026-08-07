@@ -1,8 +1,12 @@
+import { registerSchema } from '#/lib/schema/register.schema'
 import { createServerFn } from '@tanstack/react-start'
 import {
   generateUniqueStudentNumber,
   getCoursesQuery,
   getSectionsByCourseIdQuery,
+  insertStudentAccount,
+  isStudentNumberTakenQuery,
+  isUniversityEmailTakenQuery,
 } from './register.server'
 import z from 'zod'
 
@@ -56,3 +60,40 @@ export const generateStudentNumber = createServerFn({ method: 'GET' }).handler(
     }
   },
 )
+
+export const registerStudent = createServerFn({
+  method: 'GET',
+})
+  .inputValidator(registerSchema)
+  .handler(async ({ data }) => {
+    try {
+      if (await isUniversityEmailTakenQuery(data.universityEmail)) {
+        return {
+          error: {
+            field: 'universityEmail' as const,
+            message: 'This email is already registered.',
+          },
+        }
+      }
+
+      if (await isStudentNumberTakenQuery(data.studentNumber)) {
+        return {
+          error: {
+            field: 'studentNumber' as const,
+            message: 'This student number was just taken - generate a new one.',
+          },
+        }
+      }
+
+      const studentId = await insertStudentAccount(data)
+      return { studentId }
+    } catch {
+      return {
+        error: {
+          title: 'Registration failed',
+          description:
+            'Something went wrong creating your account. Please try again.',
+        },
+      }
+    }
+  })

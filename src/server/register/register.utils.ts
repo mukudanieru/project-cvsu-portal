@@ -4,3 +4,7 @@ export function generateCandidateStudentNumber(): string {
     .padStart(8, '0')
   return `2${suffix}`
 }
+
+export function toPostgresDateString(date: Date): string {
+  return date.toISOString().slice(0, 10)
+}

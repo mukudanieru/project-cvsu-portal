@@ -1,5 +1,11 @@
-import { courses, sections, students } from '@/db/schema'
-import { generateCandidateStudentNumber } from './register.utils'
+import type { RegisterFormValues } from '#/lib/schema/register.schema'
+import { hashPassword } from '#/lib/password'
+import {
+  generateCandidateStudentNumber,
+  toPostgresDateString,
+} from './register.utils'
+
+import { accounts, courses, sections, students } from '@/db/schema'
 import { db } from '@/db/drizzle'
 import { eq, asc } from 'drizzle-orm'
 
@@ -27,6 +33,16 @@ export async function getSectionsByCourseIdQuery(courseId: number) {
     .orderBy(asc(sections.yearLevel), asc(sections.sectionNumber))
 }
 
+export async function isUniversityEmailTakenQuery(universityEmail: string) {
+  const existing = await db
+    .select({ id: accounts.id })
+    .from(accounts)
+    .where(eq(accounts.universityEmail, universityEmail))
+    .limit(1)
+
+  return existing.length > 0
+}
+
 export async function isStudentNumberTakenQuery(studentNumber: string) {
   const existing = await db
     .select({ id: students.id })
@@ -49,4 +65,34 @@ export async function generateUniqueStudentNumber() {
   throw new Error(
     'Could not generate a unique student number after several attempts',
   )
+}
+
+export async function insertStudentAccount(registerValues: RegisterFormValues) {
+  const {
+    password,
+    confirmPassword,
+    universityEmail,
+    birthday,
+    ...studentFields
+  } = registerValues
+
+  const passwordHash = await hashPassword(password)
+
+  return db.transaction(async (tx) => {
+    const [student] = await tx
+      .insert(students)
+      .values({
+        ...studentFields,
+        birthday: toPostgresDateString(birthday),
+      })
+      .returning({ id: students.id })
+
+    await tx.insert(accounts).values({
+      studentId: student.id,
+      universityEmail,
+      passwordHash,
+    })
+
+    return student.id
+  })
 }
