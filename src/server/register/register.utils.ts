@@ -8,3 +8,19 @@ export function generateCandidateStudentNumber(): string {
 export function toPostgresDateString(date: Date): string {
   return date.toISOString().slice(0, 10)
 }
+
+type RegisterFieldError = {
+  type: 'field'
+  field: 'universityEmail' | 'studentNumber'
+  message: string
+}
+
+type RegisterGeneralError = {
+  type: 'general'
+  title: string
+  description: string
+}
+
+export type RegisterResult =
+  | { success: true }
+  | { error: RegisterFieldError | RegisterGeneralError }

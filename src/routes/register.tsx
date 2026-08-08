@@ -1,8 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormProvider, useForm } from 'react-hook-form'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
+import { toast } from 'sonner'
 
 import ProjectDisclaimerDialog from '#/components/LoginPage/ProjectDisclaimerDialog'
 import IdentityInfoForm from '#/components/RegistrationPage/IdentityInfoForm'
@@ -14,6 +15,7 @@ import {
   registerSchema,
   registerSteps,
   stepFieldMap,
+  fieldToStep,
 } from '#/lib/schema/register.schema'
 import type {
   RegisterFormValues,
@@ -21,8 +23,11 @@ import type {
   RegisterStep,
 } from '#/lib/schema/register.schema'
 
-// server fn
-import { getCourses } from '#/server/register/register.functions'
+import { getCurrentUserFn } from '#/server/auth/auth.functions'
+import {
+  getCourses,
+  registerStudent,
+} from '#/server/register/register.functions'
 
 const DRAFT_KEY = 'register-draft'
 
@@ -30,6 +35,12 @@ export const Route = createFileRoute('/register')({
   validateSearch: z.object({
     step: z.enum(registerSteps).default('identity'),
   }),
+
+  beforeLoad: async () => {
+    const account = await getCurrentUserFn()
+    if (account) throw redirect({ to: '/account' })
+  },
+
   loader: async () => {
     const result = await getCourses()
     return {
@@ -37,6 +48,7 @@ export const Route = createFileRoute('/register')({
       coursesUnavailable: 'error' in result,
     }
   },
+
   component: RouteComponent,
 })
 
@@ -50,6 +62,7 @@ function loadDraft(): Partial<RegisterFormInput> {
 }
 
 function RouteComponent() {
+  const router = useRouter()
   const { step } = Route.useSearch()
   const { courses, coursesUnavailable } = Route.useLoaderData()
   const navigate = Route.useNavigate()
@@ -107,11 +120,36 @@ function RouteComponent() {
   }
 
   async function onSubmit(values: RegisterFormValues) {
-    // Server function wiring comes later — placeholder for now
-    console.log('submitting', values)
+    try {
+      const result = await registerStudent({
+        data: { ...values, birthday: values.birthday.toISOString() },
+      })
 
-    localStorage.removeItem(DRAFT_KEY)
-    navigate({ to: '/' })
+      console.log(result)
+
+      if ('error' in result) {
+        if (result.error.type === 'field') {
+          const owningStep = fieldToStep[result.error.field]
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          if (owningStep && owningStep !== step) goToStep(owningStep)
+          form.setError(result.error.field, { message: result.error.message })
+          toast.error(result.error.message)
+        } else {
+          toast.error(result.error.title, {
+            description: result.error.description,
+          })
+        }
+        return
+      }
+
+      localStorage.removeItem(DRAFT_KEY)
+      await router.invalidate()
+      navigate({ to: '/account' })
+    } catch {
+      toast.error('Something went wrong', {
+        description: 'Please check your details and try again.',
+      })
+    }
   }
 
   return (

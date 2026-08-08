@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useFormContext } from 'react-hook-form'
+import { toast } from 'sonner'
 import TitleSection from '../AuthedRoute/TitleSection'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,13 +15,13 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
+import { Spinner } from '@/components/ui/spinner'
 import type {
   RegisterFormInput,
   RegisterFormValues,
 } from '#/lib/schema/register.schema'
 import PasswordInput from '../password-input'
 
-// server fn
 import { generateStudentNumber } from '#/server/register/register.functions'
 
 const CredentialsInfoForm = ({
@@ -34,8 +35,7 @@ const CredentialsInfoForm = ({
     register,
     handleSubmit,
     setValue,
-    setError,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useFormContext<RegisterFormInput, unknown, RegisterFormValues>()
 
   const [isGenerating, setIsGenerating] = useState(false)
@@ -46,7 +46,9 @@ const CredentialsInfoForm = ({
     setIsGenerating(false)
 
     if ('error' in result) {
-      setError('studentNumber', { message: result.error?.description })
+      toast.error(result.error?.title, {
+        description: result.error?.description,
+      })
       return
     }
 
@@ -88,7 +90,7 @@ const CredentialsInfoForm = ({
                         type="button"
                         variant="secondary"
                         onClick={handleGenerateStudentNumber}
-                        disabled={isGenerating}
+                        disabled={isGenerating || isSubmitting}
                       >
                         {isGenerating ? 'Generating…' : 'Generate'}
                       </InputGroupButton>
@@ -141,11 +143,12 @@ const CredentialsInfoForm = ({
               variant={'outline'}
               type="button"
               onClick={onBack}
+              disabled={isSubmitting}
             >
               Back
             </Button>
-            <Button size={'lg'} type="submit">
-              Submit
+            <Button size={'lg'} type="submit" disabled={isSubmitting}>
+              {isSubmitting ? <Spinner data-icon="inline-start" /> : 'Submit'}
             </Button>
           </div>
         </form>

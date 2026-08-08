@@ -87,12 +87,15 @@ export async function insertStudentAccount(registerValues: RegisterFormValues) {
       })
       .returning({ id: students.id })
 
-    await tx.insert(accounts).values({
-      studentId: student.id,
-      universityEmail,
-      passwordHash,
-    })
+    const [account] = await tx
+      .insert(accounts)
+      .values({
+        studentId: student.id,
+        universityEmail,
+        passwordHash,
+      })
+      .returning({ id: accounts.id })
 
-    return student.id
+    return { studentId: student.id, accountId: account.id }
   })
 }

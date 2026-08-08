@@ -80,3 +80,10 @@ export const stepFieldMap: Record<RegisterStep, (keyof RegisterFormValues)[]> =
     ],
     credentials: ['studentNumber', 'password', 'confirmPassword'],
   }
+
+export const fieldToStep = (
+  Object.entries(stepFieldMap) as [RegisterStep, (keyof RegisterFormValues)[]][]
+).reduce<Record<string, RegisterStep>>((acc, [stepName, fields]) => {
+  for (const field of fields) acc[field] = stepName
+  return acc
+}, {})

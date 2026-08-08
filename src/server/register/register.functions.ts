@@ -1,5 +1,6 @@
 import { registerSchema } from '#/lib/schema/register.schema'
 import { createServerFn } from '@tanstack/react-start'
+import { useAppSession } from '#/lib/session'
 import {
   generateUniqueStudentNumber,
   getCoursesQuery,
@@ -9,6 +10,7 @@ import {
   isUniversityEmailTakenQuery,
 } from './register.server'
 import z from 'zod'
+import type { RegisterResult } from './register.utils'
 
 export const getCourses = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -65,12 +67,13 @@ export const registerStudent = createServerFn({
   method: 'GET',
 })
   .inputValidator(registerSchema)
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<RegisterResult> => {
     try {
       if (await isUniversityEmailTakenQuery(data.universityEmail)) {
         return {
           error: {
-            field: 'universityEmail' as const,
+            type: 'field',
+            field: 'universityEmail',
             message: 'This email is already registered.',
           },
         }
@@ -79,17 +82,25 @@ export const registerStudent = createServerFn({
       if (await isStudentNumberTakenQuery(data.studentNumber)) {
         return {
           error: {
-            field: 'studentNumber' as const,
-            message: 'This student number was just taken - generate a new one.',
+            type: 'field',
+            field: 'studentNumber',
+            message: 'This student number was just taken — generate a new one.',
           },
         }
       }
 
-      const studentId = await insertStudentAccount(data)
-      return { studentId }
-    } catch {
+      const { studentId, accountId } = await insertStudentAccount(data)
+
+      const session = await useAppSession()
+      await session.update({ accountID: accountId, studentID: studentId })
+
+      return { success: true }
+    } catch (error) {
+      console.log(error)
+
       return {
         error: {
+          type: 'general',
           title: 'Registration failed',
           description:
             'Something went wrong creating your account. Please try again.',
