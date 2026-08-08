@@ -12,6 +12,7 @@ import {
   Users,
 } from 'lucide-react'
 import InfoItem from './InfoItem'
+import { toast } from 'sonner'
 
 import { getInitials } from '@/lib/utils/name'
 
@@ -36,6 +37,15 @@ type AccountCardProps = {
 }
 
 const AccountCard = ({ student }: AccountCardProps) => {
+  const handleCopyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(student.universityEmail)
+      toast.success('Email copied to clipboard')
+    } catch {
+      toast.error('Failed to copy email')
+    }
+  }
+
   return (
     <Card className="w-full max-w-2xl rounded-sm">
       <CardHeader className="px-6 py-5 flex items-center gap-4">
@@ -65,8 +75,11 @@ const AccountCard = ({ student }: AccountCardProps) => {
       </CardHeader>
 
       <CardContent>
-        <div className="grid grid-cols-2 grid-rows-2 border-b border-border mb-5">
-          <div className="row-span-2 border-r border-border px-4 py-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 divide-y divide-border sm:divide-y-0 border-b border-border mb-5">
+          <div
+            onClick={handleCopyEmail}
+            className="sm:row-span-2 sm:border-r sm:border-border m-2 px-2 py-1.5 hover:cursor-pointer hover:bg-accent transition-colors duration-200"
+          >
             <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
               <Mail size={14} />
               Email
@@ -74,7 +87,7 @@ const AccountCard = ({ student }: AccountCardProps) => {
             <p className="text-sm break-all">{student.universityEmail}</p>
           </div>
 
-          <div className="border-b border-border px-4 py-3">
+          <div className="sm:border-b sm:border-border px-4 py-3">
             <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
               <MapPin size={14} />
               Address
@@ -91,7 +104,7 @@ const AccountCard = ({ student }: AccountCardProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
           <InfoItem label="Sex" value={student.sex} icon={User} />
           <InfoItem
             label="Birthday"
