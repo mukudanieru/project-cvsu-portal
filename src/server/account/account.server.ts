@@ -2,10 +2,8 @@ import { students, accounts, courses, departments } from '@/db/schema'
 import { db } from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
 
-export async function getStudentInformation(
-  accountID: string,
-): Promise<(typeof student)[0] | null> {
-  const student = await db
+export async function getStudentInformationQuery(accountID: string) {
+  const rows = await db
     .select({
       accounts: {
         universityEmail: accounts.universityEmail,
@@ -15,7 +13,7 @@ export async function getStudentInformation(
         firstName: students.firstName,
         lastName: students.lastName,
         middleName: students.middleName,
-        studentStatus: students.studentStatus,
+        isEnrolled: students.isEnrolled,
         sex: students.sex,
         address: students.address,
         relationshipStatus: students.relationshipStatus,
@@ -38,5 +36,9 @@ export async function getStudentInformation(
     .where(eq(accounts.id, accountID))
     .limit(1)
 
-  return student[0] ?? null
+  return rows[0] ?? null
 }
+
+export type StudentInformationRow = Awaited<
+  ReturnType<typeof getStudentInformationQuery>
+>

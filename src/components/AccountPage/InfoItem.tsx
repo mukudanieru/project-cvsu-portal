@@ -13,7 +13,7 @@ const InfoItem = ({ label, value, icon: Icon }: Info) => {
         <Icon size={14} />
         {label}
       </span>
-      <span className="text-sm text-foreground">{value}</span>
+      <span className="text-sm text-foreground capitalize">{value}</span>
     </div>
   )
 }
