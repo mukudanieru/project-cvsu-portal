@@ -4,8 +4,6 @@ import { db } from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
 
 export async function findStudentByStudentNumber(studentNumber: string) {
-  console.log(studentNumber)
-
   return db.query.students.findFirst({
     where: eq(students.studentNumber, studentNumber),
     with: { account: true },
