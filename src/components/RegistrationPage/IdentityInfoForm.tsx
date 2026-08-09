@@ -16,6 +16,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import type {
   RegisterFormInput,
   RegisterFormValues,
@@ -23,6 +28,7 @@ import type {
 
 // server fn
 import { getSectionsByCourseId } from '#/server/register/register.functions'
+import { Info } from 'lucide-react'
 
 type Course = { id: number; courseName: string }
 type Section = {
@@ -213,8 +219,28 @@ const IdentityInfoForm = ({
             </Field>
 
             <Field data-invalid={errors.sectionId ? true : false}>
-              <FieldLabel htmlFor="section">
+              <FieldLabel
+                htmlFor="section"
+                className="flex items-center gap-1.5"
+              >
                 Section <span className="text-destructive">*</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-muted-foreground hover:text-foreground"
+                      aria-label="Section enrollment info"
+                    >
+                      <Info size={12} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-56 text-xs">
+                      You will be enrolled in the most advanced year level of
+                      the selected section.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </FieldLabel>
               <Controller
                 control={control}

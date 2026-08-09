@@ -7,6 +7,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ThemeProvider } from '@/components/theme-provider'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { Toaster } from '@/components/ui/sonner'
 
 import appCss from '../styles.css?url'
@@ -47,7 +48,9 @@ function RootDocument() {
       </head>
       <body className="min-h-screen flex flex-col antialiased">
         <ThemeProvider defaultTheme="system" storageKey="theme">
-          <Outlet />
+          <TooltipProvider>
+            <Outlet />
+          </TooltipProvider>
         </ThemeProvider>
         <Toaster />
         <TanStackDevtools

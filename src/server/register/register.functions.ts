@@ -33,9 +33,6 @@ export const getSectionsByCourseId = createServerFn({ method: 'GET' })
   .handler(async ({ data }) => {
     try {
       const sectionsByCourseId = await getSectionsByCourseIdQuery(data.courseId)
-
-      console.log(sectionsByCourseId)
-
       return sectionsByCourseId
     } catch {
       return {

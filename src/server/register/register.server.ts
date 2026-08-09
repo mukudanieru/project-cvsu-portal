@@ -7,7 +7,7 @@ import {
 
 import { accounts, courses, sections, students } from '@/db/schema'
 import { db } from '@/db/drizzle'
-import { eq, asc } from 'drizzle-orm'
+import { eq, asc, desc } from 'drizzle-orm'
 
 export async function getCoursesQuery() {
   return await db
@@ -21,7 +21,7 @@ export async function getCoursesQuery() {
 
 export async function getSectionsByCourseIdQuery(courseId: number) {
   return await db
-    .select({
+    .selectDistinctOn([sections.sectionNumber], {
       sectionId: sections.id,
       courseCode: courses.courseCode,
       yearLevel: sections.yearLevel,
@@ -30,7 +30,7 @@ export async function getSectionsByCourseIdQuery(courseId: number) {
     .from(sections)
     .innerJoin(courses, eq(sections.courseId, courses.id))
     .where(eq(sections.courseId, courseId))
-    .orderBy(asc(sections.yearLevel), asc(sections.sectionNumber))
+    .orderBy(sections.sectionNumber, desc(sections.yearLevel))
 }
 
 export async function isUniversityEmailTakenQuery(universityEmail: string) {
