@@ -47,7 +47,7 @@ const AccountCard = ({ student }: AccountCardProps) => {
   }
 
   return (
-    <Card className="w-full max-w-2xl rounded-sm">
+    <Card className="w-full max-w-2xl rounded-sm gap-1">
       <CardHeader className="px-6 py-5 flex items-center gap-4">
         <Avatar className="h-24 w-24">
           <AvatarImage
@@ -117,7 +117,7 @@ const AccountCard = ({ student }: AccountCardProps) => {
             icon={Globe}
           />
           <InfoItem
-            label="Relationship status"
+            label="Relationship Status"
             value={student.relationshipStatus ?? 'N/A'}
             icon={Heart}
           />
