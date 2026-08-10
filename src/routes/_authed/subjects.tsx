@@ -15,13 +15,9 @@ export const Route = createFileRoute('/_authed/subjects')({
 function RouteComponent() {
   const subjects = Route.useLoaderData()
 
-  if (subjects.error) {
+  if ('error' in subjects) {
     return <WarningMessage error={subjects.error} />
   }
 
-  return (
-    <>
-      <SubjectsPage subjectsInfo={subjects} />
-    </>
-  )
+  return <SubjectsPage subjectsInfo={subjects} />
 }

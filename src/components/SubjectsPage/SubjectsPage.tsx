@@ -1,32 +1,13 @@
 import TitleSection from '#/components/AuthedRoute/TitleSection'
 import { Badge } from '#/components/ui/badge'
-
-type Term = 'first' | 'second' | 'summer'
-
-type AcademicPeriod = {
-  startYear: number
-  endYear: number
-  term: Term
-}
-
-type StudentSubject = {
-  subjectName: string
-  subjectCode: string
-  scheduleCode: string
-  facultyFirstName: string
-  facultyLastName: string
-}
+import type { EnrolledSubjectsSuccess } from '#/server/subject/subject.functions'
 
 type SubjectsPageProps = {
-  subjectsInfo: {
-    currentPeriod?: AcademicPeriod
-    studentSubjects?: StudentSubject[]
-  }
+  subjectsInfo: EnrolledSubjectsSuccess
 }
 
 const SubjectsPage = ({ subjectsInfo }: SubjectsPageProps) => {
-  const currentPeriod = subjectsInfo.currentPeriod
-  const subjects = subjectsInfo.studentSubjects
+  const { currentPeriod, studentSubjects } = subjectsInfo
 
   return (
     <div className="flex w-full max-w-7xl flex-col gap-6 px-6 py-7">
@@ -35,17 +16,16 @@ const SubjectsPage = ({ subjectsInfo }: SubjectsPageProps) => {
 
         <div className="flex justify-between text-l font-medium">
           <div>
-            School Year: {currentPeriod?.startYear} - {currentPeriod?.endYear}
+            School Year: {currentPeriod.startYear} - {currentPeriod.endYear}
           </div>
           <div>
-            Semester:{' '}
-            <span className="capitalize">{currentPeriod?.term}</span>{' '}
+            Semester: <span className="capitalize">{currentPeriod.term}</span>
           </div>
         </div>
       </div>
 
       <div>
-        {subjects?.map((subject, idx) => (
+        {studentSubjects.map((subject, idx) => (
           <div
             key={subject.scheduleCode}
             className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-b-0"
