@@ -15,6 +15,13 @@
       "when": 1785902749824,
       "tag": "0001_orange_random",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786329703899,
+      "tag": "0002_new_onslaught",
+      "breakpoints": true
     }
   ]
 }

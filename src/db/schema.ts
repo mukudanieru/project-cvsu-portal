@@ -103,6 +103,21 @@ export const students = pgTable(
   ],
 )
 
+export const selectedPeriods = pgTable(
+  'selected_periods',
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    studentId: uuid('student_id')
+      .notNull()
+      .unique()
+      .references(() => students.id, { onDelete: 'cascade' }),
+    periodId: integer('period_id')
+      .references(() => academicPeriods.id)
+      .notNull(),
+  },
+  (table) => [index('selected_periods_period_id_idx').on(table.periodId)],
+)
+
 export const faculty = pgTable('faculty', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   facultyNumber: varchar('faculty_number', { length: 50 }).notNull().unique(),
