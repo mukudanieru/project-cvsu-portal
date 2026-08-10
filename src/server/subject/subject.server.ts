@@ -1,29 +1,8 @@
-import {
-  enrollments,
-  faculty,
-  subjectOfferings,
-  subjects,
-  academicPeriods,
-  selectedPeriods,
-} from '@/db/schema'
+import { enrollments, faculty, subjectOfferings, subjects } from '@/db/schema'
 import { db } from '@/db/drizzle'
 import { eq, and } from 'drizzle-orm'
-
-export async function getSelectedPeriodQuery(studentId: string) {
-  return await db
-    .select({
-      id: academicPeriods.id,
-      startYear: academicPeriods.startYear,
-      endYear: academicPeriods.endYear,
-      term: academicPeriods.term,
-    })
-    .from(selectedPeriods)
-    .innerJoin(
-      academicPeriods,
-      eq(academicPeriods.id, selectedPeriods.periodId),
-    )
-    .where(eq(selectedPeriods.studentId, studentId))
-}
+import { getSelectedPeriodQuery } from '../academic.server'
+import type { SelectedPeriod } from '../academic.server'
 
 export async function getEnrolledSubjectsQuery(
   studentId: string,
@@ -52,9 +31,7 @@ export async function getEnrolledSubjectsQuery(
     )
 }
 
-export type SelectedPeriod = Awaited<
-  ReturnType<typeof getSelectedPeriodQuery>
->[number]
+export { getSelectedPeriodQuery, type SelectedPeriod }
 export type EnrolledSubject = Awaited<
   ReturnType<typeof getEnrolledSubjectsQuery>
 >[number]
