@@ -14,9 +14,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { Badge } from '@/components/ui/badge'
 import { getAvailableOfferingsForStudent } from '#/server/enroll/enroll.functions'
 import SubjectsTable from '#/components/EnrollPage/SubjectsTable'
-import { Button } from '#/components/ui/button'
+import EnrollButton from '#/components/EnrollPage/EnrollButton'
 
 export const Route = createFileRoute('/_authed/enroll/')({
   loader: async () => {
@@ -27,29 +28,35 @@ export const Route = createFileRoute('/_authed/enroll/')({
 })
 
 function EnrollSubjects() {
-  const offerings = Route.useLoaderData()
+  const result = Route.useLoaderData()
 
-  if ('error' in offerings) {
+  if ('error' in result) {
     return (
       <div className="flex justify-center items-center">
-        <WarningMessage error={offerings.error} />
+        <WarningMessage error={result.error} />
       </div>
     )
   }
 
+  const { isEnrolled, terms } = result
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Subjects</CardTitle>
-        <CardDescription>
-          Browse the curriculum subjects and click enroll to enroll in all of
-          them.
-        </CardDescription>
+      <CardHeader className="flex items-center justify-between">
+        <div>
+          <CardTitle>Subjects</CardTitle>
+          <CardDescription>
+            {isEnrolled
+              ? 'You are all set and enrolled in this curriculum!'
+              : 'Explore the subjects below and click enroll to join the entire curriculum.'}
+          </CardDescription>
+        </div>
+        {isEnrolled && <Badge variant="secondary">Enrolled</Badge>}
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4 text-sm text-muted-foreground">
         <Accordion type="multiple">
-          {offerings.map((sem) => {
+          {terms.map((sem) => {
             const id = `${sem.startYear}-${sem.endYear}-${sem.term}`
 
             return (
@@ -74,7 +81,7 @@ function EnrollSubjects() {
         </Accordion>
 
         <div className="flex justify-end">
-          <Button size={'lg'}>Enroll</Button>
+          <EnrollButton disabled={isEnrolled} />
         </div>
       </CardContent>
     </Card>

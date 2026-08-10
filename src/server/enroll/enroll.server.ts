@@ -4,18 +4,28 @@ import {
   sections,
   subjects,
   students,
+  enrollments,
+  selectedPeriods,
 } from '#/db/schema'
 import { eq, and, lte, inArray, asc } from 'drizzle-orm'
 import { db } from '#/db/drizzle'
+import { getLatestOffering } from '#/lib/utils/enroll'
 
-export async function getStudentSectionIdQuery(studentId: string) {
+// Only ever called from inside db.transaction() — see insertEnrollmentRecords.
+// Worth hoisting to db/drizzle.ts if a second transactional write path shows up.
+type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
+export async function getStudentEnrollmentInfoQuery(studentId: string) {
   const [student] = await db
-    .select({ sectionId: students.sectionId })
+    .select({
+      sectionId: students.sectionId,
+      isEnrolled: students.isEnrolled,
+    })
     .from(students)
     .where(eq(students.id, studentId))
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  return student.sectionId ?? null
+  return student ?? null
 }
 
 export async function getAvailableOfferingsForStudentQuery(
@@ -74,4 +84,99 @@ export async function getAvailableOfferingsForStudentQuery(
       asc(academicPeriods.term),
       asc(subjects.subjectCode),
     )
+}
+
+// Narrow, write-path-only version of the lookup above: just offering + period
+// ids, scoped to `tx`. Deliberately not shared with the display query — that
+// one needs subject names/codes for the UI, this one doesn't.
+export async function getOfferingIdsForEnrollmentQuery(
+  studentSectionId: number,
+  tx: Transaction,
+) {
+  const [currentSection] = await tx
+    .select({
+      courseId: sections.courseId,
+      sectionNumber: sections.sectionNumber,
+      yearLevel: sections.yearLevel,
+    })
+    .from(sections)
+    .where(eq(sections.id, studentSectionId))
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!currentSection) return []
+
+  const matchingSections = await tx
+    .select({ id: sections.id })
+    .from(sections)
+    .where(
+      and(
+        eq(sections.courseId, currentSection.courseId),
+        eq(sections.sectionNumber, currentSection.sectionNumber),
+        lte(sections.yearLevel, currentSection.yearLevel),
+      ),
+    )
+
+  const sectionIds = matchingSections.map((s) => s.id)
+  if (sectionIds.length === 0) return []
+
+  return await tx
+    .select({
+      subjectOfferingId: subjectOfferings.id,
+      periodId: subjectOfferings.periodId,
+      startYear: academicPeriods.startYear,
+      term: academicPeriods.term,
+    })
+    .from(subjectOfferings)
+    .innerJoin(
+      academicPeriods,
+      eq(subjectOfferings.periodId, academicPeriods.id),
+    )
+    .where(inArray(subjectOfferings.sectionId, sectionIds))
+}
+
+export type EnrollmentOfferingRow = Awaited<
+  ReturnType<typeof getOfferingIdsForEnrollmentQuery>
+>[number]
+
+// Orchestration: insert every offering as an enrollment, point selectedPeriods
+// at the latest one, flip isEnrolled. All-or-nothing.
+export async function insertEnrollmentRecords(
+  studentId: string,
+  studentSectionId: number,
+) {
+  await db.transaction(async (tx) => {
+    const offeringRows = await getOfferingIdsForEnrollmentQuery(
+      studentSectionId,
+      tx,
+    )
+
+    const latest = getLatestOffering(offeringRows)
+
+    if (!latest) {
+      throw new Error('NO_OFFERINGS')
+    }
+
+    await tx
+      .insert(enrollments)
+      .values(
+        offeringRows.map((row) => ({
+          studentId,
+          subjectOfferingId: row.subjectOfferingId,
+        })),
+      )
+      .onConflictDoNothing()
+
+    await tx
+      .insert(selectedPeriods)
+      .values({ studentId, periodId: latest.periodId })
+      .onConflictDoUpdate({
+        target: selectedPeriods.studentId,
+        set: { periodId: latest.periodId },
+      })
+
+    await tx
+      .update(students)
+      .set({ isEnrolled: true })
+      .where(eq(students.id, studentId))
+  })
 }

@@ -60,3 +60,18 @@ export function groupOfferingsByTerm(rows: OfferingRow[]): TermGroup[] {
 
   return groups
 }
+
+const TERM_ORDER = { first: 0, second: 1, summer: 2 } as const
+
+export function getLatestOffering<
+  T extends { startYear: number; term: keyof typeof TERM_ORDER },
+>(offerings: T[]): T | undefined {
+  if (offerings.length === 0) return undefined
+
+  return offerings.reduce((latest, row) => {
+    if (row.startYear !== latest.startYear) {
+      return row.startYear > latest.startYear ? row : latest
+    }
+    return TERM_ORDER[row.term] > TERM_ORDER[latest.term] ? row : latest
+  })
+}
