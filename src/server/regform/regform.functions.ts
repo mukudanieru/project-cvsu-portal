@@ -27,9 +27,9 @@ export const getRegFormInformationForCurrentUser = createServerFn({
       return {
         error: {
           type: 'general',
-          title: 'No Semester Selected',
+          title: 'No Active Curriculum Found',
           description:
-            "You haven't selected an academic period yet. Please enroll for a semester from your Account page.",
+            'You need to enroll before you can generate a registration form. Go to your Account Settings to enroll in a curriculum.',
         },
       }
     }
@@ -38,9 +38,9 @@ export const getRegFormInformationForCurrentUser = createServerFn({
       return {
         error: {
           type: 'general',
-          title: 'No Enrollment Found',
+          title: 'No Active Subjects Found',
           description:
-            'You are not currently enrolled for this academic period.',
+            'There are no subjects registered for the currently selected semester. You can update your active semester in your Account Settings.',
         },
       }
     }

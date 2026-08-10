@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useRouter } from '@tanstack/react-router'
-import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '#/components/ui/button'
 import { enrollStudent } from '#/server/enroll/enroll.functions'
+import { Spinner } from '../ui/spinner'
 
 const EnrollButton = ({ disabled }: { disabled: boolean }) => {
   const router = useRouter()
@@ -30,10 +30,15 @@ const EnrollButton = ({ disabled }: { disabled: boolean }) => {
   }
 
   return (
-    <Button size="lg" disabled={disabled || isPending} onClick={handleEnroll}>
+    <Button
+      size="lg"
+      className="hover:cursor-pointer"
+      disabled={disabled || isPending}
+      onClick={handleEnroll}
+    >
       {isPending ? (
         <>
-          <Loader2 className="animate-spin" />
+          <Spinner data-icon="inline-start" />
           Enrolling...
         </>
       ) : disabled ? (

@@ -38,7 +38,7 @@ export const getEnrolledSubjectsForCurrentUser = createServerFn({
           type: 'general',
           title: 'No Active Curriculum Found',
           description:
-            'You need to enroll before you can view your semester schedule. Go to your Account Settings to enroll in a curriculum.',
+            'You need to enroll before you can view your subjects. Go to your Account Settings to enroll in a curriculum.',
         },
       }
     }
@@ -49,7 +49,7 @@ export const getEnrolledSubjectsForCurrentUser = createServerFn({
           type: 'general',
           title: 'No Active Subjects Found',
           description:
-            'There are no subjects registered for the currently selected semester. You can update your active semester in your Account Settings',
+            'There are no subjects registered for the currently selected semester. You can update your active semester in your Account Settings.',
         },
       }
     }

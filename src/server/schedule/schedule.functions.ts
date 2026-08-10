@@ -31,9 +31,9 @@ export const getSubjectOfferingSchedulesForCurrentUser = createServerFn({
       return {
         error: {
           type: 'general',
-          title: 'No Semester Selected',
+          title: 'No Active Curriculum Found',
           description:
-            "You haven't selected an academic period yet. Please enroll for a semester from your Account page.",
+            'You need to enroll before you can view your schedule. Go to your Account Settings to enroll in a curriculum.',
         },
       }
     }
@@ -44,7 +44,7 @@ export const getSubjectOfferingSchedulesForCurrentUser = createServerFn({
           type: 'general',
           title: 'No Schedule Available',
           description:
-            'Your subjects have no assigned schedule yet. Check back later or contact your department for more information.',
+            'There are no subjects with a schedule for the currently selected semester. You can update your active semester in your Account Settings.',
         },
       }
     }
