@@ -2,6 +2,8 @@ import { selectedPeriods, academicPeriods, students } from '@/db/schema'
 import { db } from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
 
+export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+
 export async function getSelectedPeriodQuery(studentId: string) {
   return await db
     .select({

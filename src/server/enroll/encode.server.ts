@@ -8,8 +8,7 @@ import {
 import { eq, and, asc } from 'drizzle-orm'
 import { db } from '#/db/drizzle'
 import type { GradeValue } from '#/lib/utils/encode'
-
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+import type { Transaction } from '../academic.server'
 
 // Read path: every enrollment this student has, across every term, with its
 // grade if one exists yet (null otherwise). Grouping into terms happens in

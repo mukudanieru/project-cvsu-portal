@@ -36,6 +36,12 @@ type AccountCardProps = {
   student: StudentAccount
 }
 
+const relationshipLabels: Record<string, string> = {
+  single: 'Single',
+  in_relationship: 'In a Relationship',
+  married: 'Married',
+}
+
 const AccountCard = ({ student }: AccountCardProps) => {
   const handleCopyEmail = async () => {
     try {
@@ -118,7 +124,11 @@ const AccountCard = ({ student }: AccountCardProps) => {
           />
           <InfoItem
             label="Relationship Status"
-            value={student.relationshipStatus ?? 'N/A'}
+            value={
+              student.relationshipStatus
+                ? relationshipLabels[student.relationshipStatus]
+                : 'N/A'
+            }
             icon={Heart}
           />
           <InfoItem

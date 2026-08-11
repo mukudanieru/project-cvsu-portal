@@ -11,10 +11,7 @@ import { eq, and, lte, inArray, asc } from 'drizzle-orm'
 import { db } from '#/db/drizzle'
 import { getLatestOffering } from '#/lib/utils/enroll'
 import { getStudentEnrollmentInfoQuery } from '../academic.server'
-
-// Only ever called from inside db.transaction() — see insertEnrollmentRecords.
-// Worth hoisting to db/drizzle.ts if a second transactional write path shows up.
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
+import type { Transaction } from '../academic.server'
 
 export { getStudentEnrollmentInfoQuery }
 
