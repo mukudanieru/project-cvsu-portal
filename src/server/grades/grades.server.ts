@@ -1,3 +1,4 @@
+// grades.server.ts
 import {
   grades,
   enrollments,
@@ -7,8 +8,9 @@ import {
 } from '@/db/schema'
 import { db } from '@/db/drizzle'
 import { eq, sql } from 'drizzle-orm'
+import type { GradeRow } from '#/lib/utils/grades'
 
-export async function getGrades(studentID: string) {
+export async function getGradesQuery(studentId: string): Promise<GradeRow[]> {
   return await db
     .select({
       startYear: academicPeriods.startYear,
@@ -30,7 +32,7 @@ export async function getGrades(studentID: string) {
       academicPeriods,
       eq(subjectOfferings.periodId, academicPeriods.id),
     )
-    .where(eq(enrollments.studentId, studentID))
+    .where(eq(enrollments.studentId, studentId))
     .orderBy(
       academicPeriods.startYear,
       sql`CASE ${academicPeriods.term} WHEN 'first' THEN 1 WHEN 'second' THEN 2 WHEN 'summer' THEN 3 END`,

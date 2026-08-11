@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { useRouter } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import { Loader2, Wand2 } from 'lucide-react'
+import { Spinner } from '@/components/ui/spinner'
 import { Button } from '@/components/ui/button'
+import { Wand2 } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   Table,
   TableBody,
@@ -171,7 +172,7 @@ const EncodeTermForm = ({
         >
           {isGenerating ? (
             <>
-              <Loader2 className="size-4 animate-spin" />
+              <Spinner className="size-4" />
               Generating...
             </>
           ) : (
@@ -184,7 +185,7 @@ const EncodeTermForm = ({
         <Button type="submit" size="lg" disabled={isSubmitting || isGenerating}>
           {isSubmitting ? (
             <>
-              <Loader2 className="size-4 animate-spin" />
+              <Spinner className="size-4" />
               Submitting...
             </>
           ) : (

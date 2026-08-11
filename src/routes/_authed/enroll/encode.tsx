@@ -10,9 +10,13 @@ import {
 import WarningMessage from '#/components/ErrorComponents/WarningMessage'
 import EncodeNotEnrolled from '#/components/EncodePage/EncodeNotEnrolled'
 import EncodeTerms from '#/components/EncodePage/EncodeTerms'
+import EncodeLoadingState from '#/components/EncodePage/EncodeLoadingState'
 
 export const Route = createFileRoute('/_authed/enroll/encode')({
   loader: async () => getGradeEntryData(),
+  pendingMs: 200,
+  pendingMinMs: 400,
+  pendingComponent: EncodeLoadingState,
   component: EncodeGrades,
 })
 
