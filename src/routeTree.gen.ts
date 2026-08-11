@@ -23,7 +23,7 @@ import { Route as AuthedSettingsIndexRouteImport } from './routes/_authed/settin
 import { Route as AuthedEnrollIndexRouteImport } from './routes/_authed/enroll/index'
 import { Route as AuthedSettingsDeleteRouteImport } from './routes/_authed/settings/delete'
 import { Route as AuthedSettingsAuthRouteImport } from './routes/_authed/settings/auth'
-import { Route as AuthedEnrollGradesRouteImport } from './routes/_authed/enroll/grades'
+import { Route as AuthedEnrollEncodeRouteImport } from './routes/_authed/enroll/encode'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -94,9 +94,9 @@ const AuthedSettingsAuthRoute = AuthedSettingsAuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => AuthedSettingsRouteRoute,
 } as any)
-const AuthedEnrollGradesRoute = AuthedEnrollGradesRouteImport.update({
-  id: '/grades',
-  path: '/grades',
+const AuthedEnrollEncodeRoute = AuthedEnrollEncodeRouteImport.update({
+  id: '/encode',
+  path: '/encode',
   getParentRoute: () => AuthedEnrollRouteRoute,
 } as any)
 
@@ -110,7 +110,7 @@ export interface FileRoutesByFullPath {
   '/registration-form': typeof AuthedRegistrationFormRoute
   '/schedules': typeof AuthedSchedulesRoute
   '/subjects': typeof AuthedSubjectsRoute
-  '/enroll/grades': typeof AuthedEnrollGradesRoute
+  '/enroll/encode': typeof AuthedEnrollEncodeRoute
   '/settings/auth': typeof AuthedSettingsAuthRoute
   '/settings/delete': typeof AuthedSettingsDeleteRoute
   '/enroll/': typeof AuthedEnrollIndexRoute
@@ -124,7 +124,7 @@ export interface FileRoutesByTo {
   '/registration-form': typeof AuthedRegistrationFormRoute
   '/schedules': typeof AuthedSchedulesRoute
   '/subjects': typeof AuthedSubjectsRoute
-  '/enroll/grades': typeof AuthedEnrollGradesRoute
+  '/enroll/encode': typeof AuthedEnrollEncodeRoute
   '/settings/auth': typeof AuthedSettingsAuthRoute
   '/settings/delete': typeof AuthedSettingsDeleteRoute
   '/enroll': typeof AuthedEnrollIndexRoute
@@ -142,7 +142,7 @@ export interface FileRoutesById {
   '/_authed/registration-form': typeof AuthedRegistrationFormRoute
   '/_authed/schedules': typeof AuthedSchedulesRoute
   '/_authed/subjects': typeof AuthedSubjectsRoute
-  '/_authed/enroll/grades': typeof AuthedEnrollGradesRoute
+  '/_authed/enroll/encode': typeof AuthedEnrollEncodeRoute
   '/_authed/settings/auth': typeof AuthedSettingsAuthRoute
   '/_authed/settings/delete': typeof AuthedSettingsDeleteRoute
   '/_authed/enroll/': typeof AuthedEnrollIndexRoute
@@ -160,7 +160,7 @@ export interface FileRouteTypes {
     | '/registration-form'
     | '/schedules'
     | '/subjects'
-    | '/enroll/grades'
+    | '/enroll/encode'
     | '/settings/auth'
     | '/settings/delete'
     | '/enroll/'
@@ -174,7 +174,7 @@ export interface FileRouteTypes {
     | '/registration-form'
     | '/schedules'
     | '/subjects'
-    | '/enroll/grades'
+    | '/enroll/encode'
     | '/settings/auth'
     | '/settings/delete'
     | '/enroll'
@@ -191,7 +191,7 @@ export interface FileRouteTypes {
     | '/_authed/registration-form'
     | '/_authed/schedules'
     | '/_authed/subjects'
-    | '/_authed/enroll/grades'
+    | '/_authed/enroll/encode'
     | '/_authed/settings/auth'
     | '/_authed/settings/delete'
     | '/_authed/enroll/'
@@ -304,23 +304,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedSettingsAuthRouteImport
       parentRoute: typeof AuthedSettingsRouteRoute
     }
-    '/_authed/enroll/grades': {
-      id: '/_authed/enroll/grades'
-      path: '/grades'
-      fullPath: '/enroll/grades'
-      preLoaderRoute: typeof AuthedEnrollGradesRouteImport
+    '/_authed/enroll/encode': {
+      id: '/_authed/enroll/encode'
+      path: '/encode'
+      fullPath: '/enroll/encode'
+      preLoaderRoute: typeof AuthedEnrollEncodeRouteImport
       parentRoute: typeof AuthedEnrollRouteRoute
     }
   }
 }
 
 interface AuthedEnrollRouteRouteChildren {
-  AuthedEnrollGradesRoute: typeof AuthedEnrollGradesRoute
+  AuthedEnrollEncodeRoute: typeof AuthedEnrollEncodeRoute
   AuthedEnrollIndexRoute: typeof AuthedEnrollIndexRoute
 }
 
 const AuthedEnrollRouteRouteChildren: AuthedEnrollRouteRouteChildren = {
-  AuthedEnrollGradesRoute: AuthedEnrollGradesRoute,
+  AuthedEnrollEncodeRoute: AuthedEnrollEncodeRoute,
   AuthedEnrollIndexRoute: AuthedEnrollIndexRoute,
 }
 

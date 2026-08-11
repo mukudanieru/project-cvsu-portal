@@ -7,7 +7,7 @@ export const Route = createFileRoute('/_authed/enroll')({
 
 const tabs = [
   { label: 'Subjects', to: '/enroll' },
-  { label: 'Grades', to: '/enroll/grades' },
+  { label: 'Encode', to: '/enroll/encode' },
 ] as const
 
 function EnrollLayout() {

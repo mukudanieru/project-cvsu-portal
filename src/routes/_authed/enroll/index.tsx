@@ -1,4 +1,3 @@
-// routes/_authed/enroll/index.tsx
 import WarningMessage from '#/components/ErrorComponents/WarningMessage'
 import { createFileRoute } from '@tanstack/react-router'
 import {
