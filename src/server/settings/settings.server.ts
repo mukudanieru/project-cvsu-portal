@@ -1,9 +1,13 @@
-import { students } from '#/db/schema'
+import { accounts, students } from '#/db/schema'
 import { db } from '#/db/drizzle'
 import { eq } from 'drizzle-orm'
-import type { SettingsFieldsValues } from '#/lib/schema/settings.schema'
 import type { Transaction } from '../academic.server'
 import { upsertSelectedPeriodQuery } from '../academic.server'
+import { hashPassword, verifyPassword } from '#/lib/password'
+import type {
+  SettingsFieldsValues,
+  PasswordFieldsValues,
+} from '#/lib/schema/settings.schema'
 
 export async function getStudentProfileQuery(studentId: string) {
   const rows = await db
@@ -64,4 +68,61 @@ export async function updateStudentProfile(
 
     return updated
   })
+}
+
+// Kept here per your file-count constraint. Under normal circumstances this
+// would live in a feature-neutral accounts.server.ts alongside other
+// account-table lookups, since it's not really "settings" business logic —
+// flagging in case that file exists elsewhere and this should move there.
+export async function getAccountPasswordHashQuery(studentId: string) {
+  const rows = await db
+    .select({ passwordHash: accounts.passwordHash })
+    .from(accounts)
+    .where(eq(accounts.studentId, studentId))
+
+  return rows[0] ?? null
+}
+
+export async function updateAccountPasswordQuery(
+  studentId: string,
+  passwordHash: string,
+) {
+  const [updated] = await db
+    .update(accounts)
+    .set({ passwordHash })
+    .where(eq(accounts.studentId, studentId))
+    .returning()
+
+  return updated
+}
+
+export async function updateStudentPassword(
+  studentId: string,
+  data: PasswordFieldsValues,
+) {
+  const account = await getAccountPasswordHashQuery(studentId)
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!account) {
+    throw new Error('ACCOUNT_NOT_FOUND')
+  }
+
+  const isCurrentPasswordValid = await verifyPassword(
+    data.currentPassword,
+    account.passwordHash,
+  )
+
+  if (!isCurrentPasswordValid) {
+    throw new Error('INVALID_CURRENT_PASSWORD')
+  }
+
+  const passwordHash = await hashPassword(data.newPassword)
+  const updated = await updateAccountPasswordQuery(studentId, passwordHash)
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!updated) {
+    throw new Error('ACCOUNT_NOT_FOUND')
+  }
+
+  return updated
 }

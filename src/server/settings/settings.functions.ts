@@ -1,14 +1,19 @@
 import { createServerFn } from '@tanstack/react-start'
-import { getStudentProfileQuery, updateStudentProfile } from './settings.server'
+import {
+  getStudentProfileQuery,
+  updateStudentProfile,
+  updateStudentPassword,
+} from './settings.server'
 import {
   getSelectedPeriodQuery,
   getEnrolledPeriodsQuery,
 } from '../academic.server'
-import { settingsFields } from '#/lib/schema/settings.schema'
+import { settingsFields, passwordFields } from '#/lib/schema/settings.schema'
 import { getCurrentUserFn } from '../auth/auth.functions'
 
 import type { StudentProfile } from './settings.server'
 import type { EnrolledPeriod } from '../academic.server'
+import type { PasswordFieldsValues } from '#/lib/schema/settings.schema'
 
 type GeneralError = {
   error: { type: 'general'; title: string; description: string }
@@ -97,3 +102,60 @@ export const updateProfileSettings = createServerFn({ method: 'POST' })
       }
     }
   })
+
+type FieldError = {
+  error: {
+    type: 'field'
+    field: 'currentPassword'
+    message: string
+  }
+}
+
+export const updatePasswordSettings = createServerFn({ method: 'POST' })
+  .inputValidator(passwordFields)
+  .handler(
+    async ({
+      data,
+    }: {
+      data: PasswordFieldsValues
+    }): Promise<{ success: true } | GeneralError | FieldError> => {
+      try {
+        const currentUser = await getCurrentUserFn()
+
+        if (!currentUser) {
+          return {
+            error: {
+              type: 'general',
+              title: 'Unauthorized',
+              description: 'You must be logged in to access this resource.',
+            },
+          }
+        }
+
+        await updateStudentPassword(currentUser.studentID, data)
+
+        return { success: true }
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message === 'INVALID_CURRENT_PASSWORD'
+        ) {
+          return {
+            error: {
+              type: 'field',
+              field: 'currentPassword',
+              message: 'Current password is incorrect',
+            },
+          }
+        }
+
+        return {
+          error: {
+            type: 'general',
+            title: 'Update failed',
+            description: 'We could not update your password. Please try again.',
+          },
+        }
+      }
+    },
+  )
