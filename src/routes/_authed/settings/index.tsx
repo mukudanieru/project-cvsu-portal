@@ -32,19 +32,24 @@ import {
   getProfileSettings,
   updateProfileSettings,
 } from '#/server/settings/settings.functions'
-import { profileFields } from '#/lib/schema/settings.schema'
-
+import { settingsFields } from '#/lib/schema/settings.schema'
 import type {
-  ProfileFieldsInput,
-  ProfileFieldsValues,
+  SettingsFieldsInput,
+  SettingsFieldsValues,
 } from '#/lib/schema/settings.schema'
+
+const termLabels = {
+  first: 'First Term',
+  second: 'Second Term',
+  summer: 'Summer Term',
+} as const
 
 export const Route = createFileRoute('/_authed/settings/')({
   loader: async () => {
     const profile = await getProfileSettings()
 
     if ('error' in profile) {
-      throw redirect({ to: '/' })
+      throw redirect({ to: '/account' })
     }
 
     return profile
@@ -61,8 +66,8 @@ function ProfileSettings() {
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-  } = useForm<ProfileFieldsInput, unknown, ProfileFieldsValues>({
-    resolver: zodResolver(profileFields),
+  } = useForm<SettingsFieldsInput, unknown, SettingsFieldsValues>({
+    resolver: zodResolver(settingsFields),
     defaultValues: {
       address: profile.address,
       sex: profile.sex,
@@ -70,10 +75,11 @@ function ProfileSettings() {
       citizenship: profile.citizenship,
       relationshipStatus: profile.relationshipStatus ?? 'single',
       guardian: profile.guardian ?? '',
+      periodId: profile.selectedPeriodId ?? undefined,
     },
   })
 
-  const onSubmit = async (data: ProfileFieldsValues) => {
+  const onSubmit = async (data: SettingsFieldsValues) => {
     const result = await updateProfileSettings({
       data: {
         ...data,
@@ -232,6 +238,52 @@ function ProfileSettings() {
               {errors.guardian && (
                 <FieldDescription className="text-destructive">
                   {errors.guardian.message}
+                </FieldDescription>
+              )}
+            </Field>
+
+            <Field data-invalid={!!errors.periodId}>
+              <FieldLabel htmlFor="periodSelection">
+                Period Selection
+              </FieldLabel>
+              <Controller
+                control={control}
+                name="periodId"
+                render={({ field }) => (
+                  <Select
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={field.value ? String(field.value) : undefined}
+                    disabled={profile.periodOptions.length === 0}
+                  >
+                    <SelectTrigger id="periodSelection" className="w-full">
+                      <SelectValue
+                        placeholder={
+                          profile.periodOptions.length === 0
+                            ? 'No enrollment history yet'
+                            : 'Select a term to display'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {profile.periodOptions.map((period) => (
+                        <SelectItem key={period.id} value={String(period.id)}>
+                          {termLabels[period.term]} (AC {period.startYear}-
+                          {period.endYear})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FieldDescription>
+                Since this is a simulated university portal, you select any term
+                to display. This only controls which term's data shows up on
+                your Subjects, Schedules, and Registration Form pages - it
+                doesn't change your actual enrollment records.
+              </FieldDescription>
+              {errors.periodId && (
+                <FieldDescription className="text-destructive">
+                  {errors.periodId.message}
                 </FieldDescription>
               )}
             </Field>

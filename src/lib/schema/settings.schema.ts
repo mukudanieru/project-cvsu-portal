@@ -14,5 +14,15 @@ export const profileFields = z.object({
   guardian: z.string().min(1, 'Guardian name is required'),
 })
 
-export type ProfileFieldsInput = z.input<typeof profileFields>
-export type ProfileFieldsValues = z.infer<typeof profileFields>
+export const periodSelectionField = z.object({
+  // Optional: a never-enrolled student has no periods to pick from yet.
+  periodId: z.coerce.number().int().positive().optional(),
+})
+
+export const settingsFields = z.object({
+  ...profileFields.shape,
+  ...periodSelectionField.shape,
+})
+
+export type SettingsFieldsInput = z.input<typeof settingsFields>
+export type SettingsFieldsValues = z.infer<typeof settingsFields>

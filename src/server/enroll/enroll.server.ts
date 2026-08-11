@@ -5,12 +5,15 @@ import {
   subjects,
   students,
   enrollments,
-  selectedPeriods,
+  selectedPeriods, // not being used because of upsertSelectedPeriodQuery fn
 } from '#/db/schema'
 import { eq, and, lte, inArray, asc } from 'drizzle-orm'
 import { db } from '#/db/drizzle'
 import { getLatestOffering } from '#/lib/utils/enroll'
-import { getStudentEnrollmentInfoQuery } from '../academic.server'
+import {
+  getStudentEnrollmentInfoQuery,
+  upsertSelectedPeriodQuery,
+} from '../academic.server'
 import type { Transaction } from '../academic.server'
 
 export { getStudentEnrollmentInfoQuery }
@@ -153,13 +156,7 @@ export async function insertEnrollmentRecords(
       )
       .onConflictDoNothing()
 
-    await tx
-      .insert(selectedPeriods)
-      .values({ studentId, periodId: latest.periodId })
-      .onConflictDoUpdate({
-        target: selectedPeriods.studentId,
-        set: { periodId: latest.periodId },
-      })
+    await upsertSelectedPeriodQuery(tx, studentId, latest.periodId)
 
     await tx
       .update(students)

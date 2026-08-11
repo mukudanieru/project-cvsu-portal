@@ -1,15 +1,26 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getStudentProfileQuery, updateStudentProfile } from './settings.server'
-import { profileFields } from '#/lib/schema/settings.schema'
+import {
+  getSelectedPeriodQuery,
+  getEnrolledPeriodsQuery,
+} from '../academic.server'
+import { settingsFields } from '#/lib/schema/settings.schema'
 import { getCurrentUserFn } from '../auth/auth.functions'
+
 import type { StudentProfile } from './settings.server'
+import type { EnrolledPeriod } from '../academic.server'
 
 type GeneralError = {
   error: { type: 'general'; title: string; description: string }
 }
 
+type ProfileSettingsData = NonNullable<StudentProfile> & {
+  selectedPeriodId: number | null
+  periodOptions: EnrolledPeriod[]
+}
+
 export const getProfileSettings = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<StudentProfile | GeneralError> => {
+  async (): Promise<ProfileSettingsData | GeneralError> => {
     try {
       const currentUser = await getCurrentUserFn()
 
@@ -23,7 +34,11 @@ export const getProfileSettings = createServerFn({ method: 'GET' }).handler(
         }
       }
 
-      const profile = await getStudentProfileQuery(currentUser.studentID)
+      const [profile, selectedPeriod, periodOptions] = await Promise.all([
+        getStudentProfileQuery(currentUser.studentID),
+        getSelectedPeriodQuery(currentUser.studentID),
+        getEnrolledPeriodsQuery(currentUser.studentID),
+      ])
 
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (!profile) {
@@ -36,7 +51,11 @@ export const getProfileSettings = createServerFn({ method: 'GET' }).handler(
         }
       }
 
-      return profile
+      return {
+        ...profile,
+        selectedPeriodId: selectedPeriod[0]?.id ?? null,
+        periodOptions,
+      }
     } catch {
       return {
         error: {
@@ -50,7 +69,7 @@ export const getProfileSettings = createServerFn({ method: 'GET' }).handler(
 )
 
 export const updateProfileSettings = createServerFn({ method: 'POST' })
-  .inputValidator(profileFields)
+  .inputValidator(settingsFields)
   .handler(async ({ data }): Promise<{ success: true } | GeneralError> => {
     try {
       const currentUser = await getCurrentUserFn()

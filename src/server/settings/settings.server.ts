@@ -1,9 +1,9 @@
 import { students } from '#/db/schema'
 import { db } from '#/db/drizzle'
 import { eq } from 'drizzle-orm'
-
-import type { ProfileFieldsValues } from '#/lib/schema/settings.schema'
+import type { SettingsFieldsValues } from '#/lib/schema/settings.schema'
 import type { Transaction } from '../academic.server'
+import { upsertSelectedPeriodQuery } from '../academic.server'
 
 export async function getStudentProfileQuery(studentId: string) {
   const rows = await db
@@ -26,7 +26,7 @@ export type StudentProfile = Awaited<ReturnType<typeof getStudentProfileQuery>>
 export async function updateStudentProfileQuery(
   tx: Transaction,
   studentId: string,
-  data: ProfileFieldsValues,
+  data: Omit<SettingsFieldsValues, 'periodId'>,
 ) {
   const [updated] = await tx
     .update(students)
@@ -46,14 +46,20 @@ export async function updateStudentProfileQuery(
 
 export async function updateStudentProfile(
   studentId: string,
-  data: ProfileFieldsValues,
+  data: SettingsFieldsValues,
 ) {
+  const { periodId, ...profileData } = data
+
   return await db.transaction(async (tx) => {
-    const updated = await updateStudentProfileQuery(tx, studentId, data)
+    const updated = await updateStudentProfileQuery(tx, studentId, profileData)
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!updated) {
       throw new Error('STUDENT_NOT_FOUND')
+    }
+
+    if (periodId !== undefined) {
+      await upsertSelectedPeriodQuery(tx, studentId, periodId)
     }
 
     return updated
