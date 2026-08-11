@@ -10,23 +10,13 @@ import {
 import { eq, and, lte, inArray, asc } from 'drizzle-orm'
 import { db } from '#/db/drizzle'
 import { getLatestOffering } from '#/lib/utils/enroll'
+import { getStudentEnrollmentInfoQuery } from '../academic.server'
 
 // Only ever called from inside db.transaction() — see insertEnrollmentRecords.
 // Worth hoisting to db/drizzle.ts if a second transactional write path shows up.
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
 
-export async function getStudentEnrollmentInfoQuery(studentId: string) {
-  const [student] = await db
-    .select({
-      sectionId: students.sectionId,
-      isEnrolled: students.isEnrolled,
-    })
-    .from(students)
-    .where(eq(students.id, studentId))
-
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  return student ?? null
-}
+export { getStudentEnrollmentInfoQuery }
 
 export async function getAvailableOfferingsForStudentQuery(
   studentSectionId: number,

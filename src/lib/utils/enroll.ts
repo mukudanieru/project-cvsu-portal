@@ -61,7 +61,7 @@ export function groupOfferingsByTerm(rows: OfferingRow[]): TermGroup[] {
   return groups
 }
 
-const TERM_ORDER = { first: 0, second: 1, summer: 2 } as const
+export const TERM_ORDER = { first: 0, second: 1, summer: 2 } as const
 
 export function getLatestOffering<
   T extends { startYear: number; term: keyof typeof TERM_ORDER },

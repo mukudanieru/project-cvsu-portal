@@ -1,4 +1,4 @@
-import { selectedPeriods, academicPeriods } from '@/db/schema'
+import { selectedPeriods, academicPeriods, students } from '@/db/schema'
 import { db } from '@/db/drizzle'
 import { eq } from 'drizzle-orm'
 
@@ -21,3 +21,16 @@ export async function getSelectedPeriodQuery(studentId: string) {
 export type SelectedPeriod = Awaited<
   ReturnType<typeof getSelectedPeriodQuery>
 >[number]
+
+export async function getStudentEnrollmentInfoQuery(studentId: string) {
+  const [student] = await db
+    .select({
+      sectionId: students.sectionId,
+      isEnrolled: students.isEnrolled,
+    })
+    .from(students)
+    .where(eq(students.id, studentId))
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  return student ?? null
+}
