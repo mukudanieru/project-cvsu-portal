@@ -7,6 +7,7 @@ import { hashPassword, verifyPassword } from '#/lib/password'
 import type {
   SettingsFieldsValues,
   PasswordFieldsValues,
+  DeleteAccountFieldValues,
 } from '#/lib/schema/settings.schema'
 
 export async function getStudentProfileQuery(studentId: string) {
@@ -125,4 +126,43 @@ export async function updateStudentPassword(
   }
 
   return updated
+}
+
+export async function deleteStudentAccountQuery(studentId: string) {
+  const [deleted] = await db
+    .delete(students)
+    .where(eq(students.id, studentId))
+    .returning({ id: students.id })
+
+  return deleted
+}
+
+export async function deleteStudentAccount(
+  studentId: string,
+  data: DeleteAccountFieldValues,
+) {
+  const account = await getAccountPasswordHashQuery(studentId)
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!account) {
+    throw new Error('ACCOUNT_NOT_FOUND')
+  }
+
+  const isPasswordValid = await verifyPassword(
+    data.currentPassword,
+    account.passwordHash,
+  )
+
+  if (!isPasswordValid) {
+    throw new Error('INVALID_CURRENT_PASSWORD')
+  }
+
+  const deleted = await deleteStudentAccountQuery(studentId)
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (!deleted) {
+    throw new Error('ACCOUNT_NOT_FOUND')
+  }
+
+  return deleted
 }

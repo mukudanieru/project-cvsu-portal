@@ -54,7 +54,7 @@ export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
   const session = await useAppSession()
   await session.clear()
 
-  return { sucess: true }
+  return { success: true }
 })
 
 export const getCurrentUserFn = createServerFn({ method: 'GET' }).handler(

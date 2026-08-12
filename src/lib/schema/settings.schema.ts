@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+// Profile tab
 export const profileFields = z.object({
   address: z.string().min(1, 'Address is required'),
   sex: z.enum(['male', 'female'], { error: 'Select a sex' }),
@@ -27,6 +28,7 @@ export const settingsFields = z.object({
 export type SettingsFieldsInput = z.input<typeof settingsFields>
 export type SettingsFieldsValues = z.infer<typeof settingsFields>
 
+// Auth tab
 export const passwordFields = z
   .object({
     currentPassword: z.string().min(1, 'Current password is required'),
@@ -40,3 +42,11 @@ export const passwordFields = z
 
 export type PasswordFieldsInput = z.input<typeof passwordFields>
 export type PasswordFieldsValues = z.infer<typeof passwordFields>
+
+// Delete tab
+export const deleteAccountField = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
+})
+
+export type DeleteAccountFieldInput = z.input<typeof deleteAccountField>
+export type DeleteAccountFieldValues = z.infer<typeof deleteAccountField>
