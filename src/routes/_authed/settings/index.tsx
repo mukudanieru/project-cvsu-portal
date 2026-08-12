@@ -1,4 +1,6 @@
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Card,
   CardContent,
@@ -19,14 +21,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Input } from '@/components/ui/input'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import ProfileSkeleton from '#/components/SettingsPage/ProfileSkeleton'
 import { Textarea } from '@/components/ui/textarea'
-import { Button } from '#/components/ui/button'
 import { Spinner } from '#/components/ui/spinner'
-import { Save } from 'lucide-react'
+import { Button } from '#/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Save, Info } from 'lucide-react'
 import { toast } from 'sonner'
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 
 import {
   getProfileSettings,
@@ -54,6 +60,7 @@ export const Route = createFileRoute('/_authed/settings/')({
 
     return profile
   },
+  pendingComponent: ProfileSkeleton,
   component: ProfileSettings,
 })
 
@@ -245,6 +252,23 @@ function ProfileSettings() {
             <Field data-invalid={!!errors.periodId}>
               <FieldLabel htmlFor="periodSelection">
                 Period Selection
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-muted-foreground hover:text-foreground"
+                      aria-label="Section enrollment info"
+                    >
+                      <Info size={12} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-56 text-xs">
+                      By default, the curriculum's final term/semester is
+                      selected.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </FieldLabel>
               <Controller
                 control={control}
@@ -276,10 +300,10 @@ function ProfileSettings() {
                 )}
               />
               <FieldDescription>
-                Since this is a simulated university portal, you select any term
-                to display. This only controls which term's data shows up on
-                your Subjects, Schedules, and Registration Form pages - it
-                doesn't change your actual enrollment records.
+                Feel free to select any term above to explore your past or
+                current schedules and subjects. This only controls which term's
+                data shows up on your Subjects, Schedules, and Registration Form
+                pages - it doesn't change your actual enrollment records.
               </FieldDescription>
               {errors.periodId && (
                 <FieldDescription className="text-destructive">

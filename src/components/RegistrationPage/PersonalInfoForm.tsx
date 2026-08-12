@@ -40,8 +40,8 @@ const PersonalInfoForm = ({
         <div className="flex flex-col gap-2 sm:max-w-xs">
           <TitleSection title="Personal Information" />
           <p className="text-sm">
-            Provide your demographic details, permanent address, and guardian
-            information.
+            Provide your demographic details, address, and guardian information.
+            Feel free to use unofficial or dummy data for this step.
           </p>
         </div>
 

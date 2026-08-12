@@ -15,12 +15,18 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { Spinner } from '@/components/ui/spinner'
 import type {
   RegisterFormInput,
   RegisterFormValues,
 } from '#/lib/schema/register.schema'
 import PasswordInput from '../password-input'
+import { Info } from 'lucide-react'
 
 import { generateStudentNumber } from '#/server/register/register.functions'
 
@@ -60,10 +66,18 @@ const CredentialsInfoForm = ({
       <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between sm:gap-16">
         <div className="flex flex-col gap-2 sm:max-w-xs">
           <TitleSection title="Account Credentials" />
-          <p className="text-sm">
-            Generate your student number and set a password to complete your
-            registration.
-          </p>
+          <div className="text-sm space-y-2">
+            <p>
+              Generate your student number and set a password to complete your
+              registration:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-xs pl-1">
+              <li>
+                For your safety, refrain from using your real-world or primary
+                passwords.
+              </li>
+            </ul>
+          </div>
         </div>
 
         <form
@@ -106,7 +120,27 @@ const CredentialsInfoForm = ({
               </div>
 
               <Field data-invalid={errors.password ? true : false}>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <FieldLabel htmlFor="password">
+                  Password{' '}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label="Section enrollment info"
+                      >
+                        <Info size={12} />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-56 text-xs">
+                        Avoid using your real-world passwords here. Feel free to
+                        use a simple, dummy password just for this simulated
+                        account.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </FieldLabel>
                 <PasswordInput
                   id="password"
                   {...register('password')}

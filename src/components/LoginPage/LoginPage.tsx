@@ -151,12 +151,12 @@ const LoginPage = ({ onSuccess }: Props) => {
                     {loading ? <Spinner data-icon="inline-start" /> : 'Login'}
                   </Button>
                   <FieldDescription className="text-center">
-                    Want to register your own?{' '}
+                    Curious about the portal?{' '}
                     <Link
                       to="/register"
                       className="hover:text-foreground! transition-colors"
                     >
-                      Register
+                      Create a simulated account
                     </Link>
                   </FieldDescription>
                 </Field>

@@ -56,10 +56,7 @@ const AccountCard = ({ student }: AccountCardProps) => {
     <Card className="w-full max-w-2xl rounded-sm gap-1">
       <CardHeader className="px-6 py-5 flex items-center gap-4">
         <Avatar className="h-24 w-24">
-          <AvatarImage
-            src="https://github.com/shadcn.png"
-            alt={getInitials(student.fullName)}
-          />
+          <AvatarImage src="/profile.jpg" alt={getInitials(student.fullName)} />
           <AvatarFallback className="rounded-lg">
             {getInitials(student.fullName)}
           </AvatarFallback>

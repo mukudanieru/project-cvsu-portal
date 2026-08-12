@@ -48,7 +48,7 @@ function AuthedComponent() {
     ? {
         name: data.fullName,
         studentNumber: data.studentNumber,
-        avatar: 'https://github.com/shadcn.png',
+        avatar: '/profile.jpg',
       }
     : null
 

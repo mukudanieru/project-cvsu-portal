@@ -98,10 +98,20 @@ const IdentityInfoForm = ({
       <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between sm:gap-16">
         <div className="flex flex-col gap-2 sm:max-w-xs">
           <TitleSection title="Identity Information" />
-          <p className="text-sm">
-            Enter your name, university email, and your target course and
-            section to set up your simulated student profile.
-          </p>
+          <div className="text-sm space-y-1.5">
+            <p>
+              Provide your name, university email, and preferred course to set
+              up your simulated student profile:
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-xs pl-1">
+              <li>Feel free to use unofficial information.</li>
+              <li>Avoid using any real or official email addresses.</li>
+              <li>
+                Course options are incomplete as we do not have access to the
+                real curriculum data.
+              </li>
+            </ul>
+          </div>
         </div>
 
         <form className="flex w-full flex-col gap-8 lg:w-2/3">
@@ -155,6 +165,24 @@ const IdentityInfoForm = ({
             <Field data-invalid={errors.universityEmail ? true : false}>
               <FieldLabel htmlFor="university-email">
                 University Email <span className="text-destructive">*</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-muted-foreground hover:text-foreground"
+                      aria-label="Section enrollment info"
+                    >
+                      <Info size={12} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-56 text-xs">
+                      You can use a placeholder format (e.g., name@email.com).
+                      Please avoid using any real personal or institutional
+                      email addresses.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
               </FieldLabel>
               <Input
                 id="university-email"

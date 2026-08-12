@@ -96,7 +96,7 @@ function DeleteAccountSettings() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="flex flex-col gap-6">
+        <form className="flex flex-col gap-6 max-w-124">
           <FieldGroup>
             <Field data-invalid={!!errors.currentPassword}>
               <FieldLabel htmlFor="current-password">
