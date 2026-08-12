@@ -233,7 +233,7 @@ export const enrollments = pgTable(
   {
     id: integer().primaryKey().generatedByDefaultAsIdentity(),
     studentId: uuid('student_id')
-      .references(() => students.id)
+      .references(() => students.id, { onDelete: 'cascade' })
       .notNull(),
     subjectOfferingId: integer('subject_offering_id')
       .references(() => subjectOfferings.id)
@@ -250,7 +250,7 @@ export const enrollments = pgTable(
 export const grades = pgTable('grades', {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   enrollmentId: integer('enrollment_id')
-    .references(() => enrollments.id)
+    .references(() => enrollments.id, { onDelete: 'cascade' })
     .notNull()
     .unique(),
   finalGrade: decimal('final_grade', { precision: 3, scale: 2 }).notNull(),
